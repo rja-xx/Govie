@@ -1,0 +1,15 @@
+<ion-view view-title="Login" ng-controller="LoginCtrl">
+    <ion-content>
+        <div class="list">
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Username</span>
+                <input type="text" ng-model="username" placeholder="john.snow@wall.org">
+            </label>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Password</span>
+                <input type="password" ng-model="password" placeholder="password">
+            </label>
+            <button ng-click="login(username, password)">Log in</button>
+        </div>
+    </ion-content>
+</ion-view>

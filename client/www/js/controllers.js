@@ -5,7 +5,7 @@ angular.module('starter.controllers', [])
             var token = $localStorage.get("govie-auth-token");
             $http.defaults.headers.common['x-access-token'] = token;
             if (token) {
-                $http.get('http://localhost:8080/govie/wall').then(
+                $http.get('http://213.67.22.6:8976/govie/wall').then(
                     function (res) {
                         $scope.username = res.data.username;
                         $scope.message = res.data.message;
@@ -75,7 +75,6 @@ angular.module('starter.controllers', [])
 
     .controller('CreateUserCtrl', function ($state, $scope, $http, $state, $localStorage) {
 
-
         $scope.createUser = function (alias, username, password) {
             var request = {
                 alias: alias,
@@ -83,7 +82,7 @@ angular.module('starter.controllers', [])
                 password: password
             };
             console.log(request);
-            $http.post('http://localhost:8080/addUser', request).then(function (res) {
+            $http.post('http://213.67.22.6:8976/addUser', request).then(function (res) {
                     $localStorage.set("govie-auth-token", res.data.token);
                     $http.defaults.headers.common['x-access-token'] = res.data.token;
                     $scope.modal.hide();
@@ -98,7 +97,7 @@ angular.module('starter.controllers', [])
     .controller('LoginCtrl', function ($state, $scope, $http, $localStorage) {
         $scope.login = function (username, password) {
             var request = {username: username, password: password};
-            $http.post('http://localhost:8080/authenticate', request).then(function (res) {
+            $http.post('http://213.67.22.6:8976/authenticate', request).then(function (res) {
                     $localStorage.set("govie-auth-token", res.data.token);
                     $http.defaults.headers.common['x-access-token'] = res.data.token;
                     $scope.modal.hide();

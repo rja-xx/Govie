@@ -14,6 +14,14 @@ var mongoose = require('mongoose');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
+var owasp = require('owasp-password-strength-test');
+owasp.config({
+    allowPassphrases       : true,
+    maxLength              : 128,
+    minLength              : 6,
+    minPhraseLength        : 10,
+    minOptionalTestsToPass : 2,
+});
 mongoose.connect(Config.database);
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -37,6 +45,12 @@ var port = process.env.PORT || 8080;        // set our port
 
 app.post('/addUser', function (req, res) {
     console.log("adding user: " + JSON.stringify(req.body));
+
+    var passwordStrength = owasp.test(req.body.password);
+    if(!passwordStrength.strong){
+        res.status(400).json({message: "Weak password", errors: passwordStrength.errors});
+        return res;
+    }
 
     var user = new User();
     user.alias = req.body.alias;
