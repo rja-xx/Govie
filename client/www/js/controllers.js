@@ -73,8 +73,22 @@ angular.module('starter.controllers', [])
         console.log('got splash');
     })
 
-    .controller('CreateUserCtrl', function ($state, $scope, $http, $state, $localStorage) {
-
+    .controller('CreateUserCtrl', function ($state, $scope, $http, $state, $localStorage, _, owasp) {
+        $scope.hasErrors = function () {
+            var errors = $scope.errors;
+            if (errors) {
+                return errors.length > 0;
+            } else {
+                return false
+            }
+        }
+        $scope.isStrong = function (password) {
+            if(password) {
+                return owasp.test(password).strong
+            }else{
+                return false;
+            }
+        };
         $scope.createUser = function (alias, username, password) {
             var request = {
                 alias: alias,
@@ -89,7 +103,11 @@ angular.module('starter.controllers', [])
                     $state.go('tab.wall', {}, {reload: true});
                 },
                 function (err) {
-                    console.log(JSON.stringify(err))
+                    if (err.status === 400) {
+                        $scope.errors = err.data.errors;
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
                 });
         }
     })

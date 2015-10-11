@@ -12,7 +12,13 @@
       <label class="item item-input item-stacked-label">
         <span class="input-label">Password</span>
         <input type="password" ng-model="password">
+        <span ng-if="isStrong(password)">Ok!</span>
       </label>
+      <ul ng-if="hasErrors()">
+        <li ng-repeat="error in errors">
+          {{error}}
+        </li>
+      </ul>
       <button ng-click="createUser(alias, username, password)">Save</button>
     </div>
   </ion-content>
