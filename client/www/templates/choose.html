@@ -1,11 +1,15 @@
 <ion-view title="Register or Log in" ng-controller="ChooseCtrl">
-    <ion-content>
+    <ion-content class="govie-choose">
+        <img class="govie-logo1" src="./img/govie_hela_loggan_vit.png" alt="logo"/>
+        <img class="govie-logo2" src="./img/govie_logga_saveit_ljusvit.png" alt="logo"/>
         <div class="list">
-            <a class="item" ng-click="openLogin()">
-                Log in
-            </a>
-            <a class="item" ng-click="openCreateUser()">
+            <a class="item govie-button" ng-click="openCreateUser()">
+              <i class="govie-new"></i>
                 Create User
+            </a>
+            <a class="item govie-button" ng-click="openLogin()">
+              <i class="govie-login"></i>
+                Log in
             </a>
         </div>
     </ion-content>

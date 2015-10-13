@@ -1,21 +1,69 @@
 /* Empty. Add your own CSS if you like */
-
-
-
-.govie-splash{
+.govie-choose {
   background-color: #fc3159;
-      height: 100%;
-      width: 100%;
-      bottom: 0;
-left: 0;
-margin: auto;
-overflow: auto;
-position: fixed;
-right: 0;
-top: 0;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  overflow: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
 }
 
-.govie-splash img{
-    width: 30%;
-    margin: 35%;
+.govie-logo1 {
+  width: 40%;
+  margin: 30% 0% 0% 30%;
+}
+.govie-logo2 {
+  width: 30%;
+  margin: 5% 0% 30% 35%;
+}
+a.govie-button {
+  background-color: #fc3159;
+  font-weight: bold;
+  color: white;
+  font-family: "Helvetica Neue";
+  padding-left: 40%;
+}
+
+i.govie-login {
+position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 0%;
+  bottom: 15%;
+  background-image: url("../img/govie_logga_vit.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+i.govie-new {
+position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 0%;
+  bottom: 15%;
+  background-image: url("../img/govie_star_gul.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.govie-splash {
+  background-color: #fc3159;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  overflow: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+.govie-splash img {
+  width: 30%;
+  margin: 35%;
 }
