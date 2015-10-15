@@ -73,7 +73,7 @@ angular.module('starter.controllers', [])
     console.log('got splash');
   })
 
-  .controller('CreateUserCtrl', function ($state, $scope, $http, $state, $localStorage, _, owasp) {
+  .controller('CreateUserCtrl', function ($state, $scope, $http, $localStorage, _, owasp) {
     $scope.hasErrors = function () {
       var errors = $scope.errors;
       if (errors) {
@@ -125,6 +125,9 @@ angular.module('starter.controllers', [])
   })
 
   .controller('LoginCtrl', function ($state, $scope, $http, $localStorage) {
+    $scope.wipeErrors = function(){
+        $scope.errors = [];
+    };
     $scope.login = function (username, password) {
       var request = {username: username, password: password};
       $http.post('http://213.67.22.6:8976/authenticate', request).then(function (res) {
@@ -133,8 +136,8 @@ angular.module('starter.controllers', [])
           $scope.modal.hide();
           $state.go('tab.wall', {}, {reload: true});
         },
-        function (err) {
-          console.log(JSON.stringify(err))
+        function () {
+          $scope.errors = ['Login failed!'];
         });
     };
   })

@@ -23,8 +23,17 @@
 }
 
 .govie-licence {
-  width: 80%;
+  width: 100%;
   text-align: center;
+  margin: 5% 0% 0% 0%;
+}
+.govie-errors {
+  width: 80%;
+  font-size: 150%;
+  font-weight: bold;
+  font-family: "Helvetica Neue";
+  text-align: center;
+  color: darkred !important;
   margin: 10% 0% 0% 10%;
 }
 
@@ -44,7 +53,7 @@ a.govie-button {
   font-family: "Helvetica Neue";
   text-align: center;
   margin-left: 30%;
-  margin-top: 10%;
+  margin-top: 5%;
   border-radius: 7%
 }
 
@@ -106,7 +115,7 @@ i.govie-new {
   right: 0%;
   bottom: 15%;
   background-repeat: no-repeat;
-  background-size: 70%;
+  background-size: 40%;
 }
 
 .govie-create-user-view i.nok {
@@ -117,7 +126,7 @@ i.govie-new {
   right: 0%;
   bottom: 15%;
   background-repeat: no-repeat;
-  background-size: 70%;
+  background-size: 40%;
 }
 
 #input_container {
