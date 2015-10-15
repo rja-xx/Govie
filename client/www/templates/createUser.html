@@ -1,25 +1,33 @@
 <ion-view view-title="createUser" ng-controller="CreateUserCtrl">
-  <ion-content>
+  <div class="bar bar-header bar-light govie-header">
+    <h1 class="title">Create user</h1>
+  </div>
+  <ion-content class="has-header govie-create-user-view">
     <div class="list">
       <label class="item item-input item-stacked-label">
-        <span class="input-label">Alias</span>
-        <input type="text" ng-model="alias">
+        <input type="text" ng-model="alias" placeholder="Create an alias">
+        <i ng-class="notEmpty(alias)"></i>
       </label>
       <label class="item item-input item-stacked-label">
-        <span class="input-label">Username</span>
-        <input type="text" ng-model="username" placeholder="john.snow@wall.org">
+        <input type="text" ng-model="username" placeholder="Create a username">
+        <i ng-class="notEmpty(username)"></i>
       </label>
       <label class="item item-input item-stacked-label">
-        <span class="input-label">Password</span>
-        <input type="password" ng-model="password">
-        <span ng-if="isStrong(password)">Ok!</span>
+        <input type="password" ng-model="password" placeholder="Create a password">
+        <i ng-class="passwordApproved(password)"></i>
       </label>
       <ul ng-if="hasErrors()">
         <li ng-repeat="error in errors">
           {{error}}
         </li>
       </ul>
-      <button ng-click="createUser(alias, username, password)">Save</button>
+      <div class="govie-licence">
+        <label>I do accept the terms of agreement.</label>
+
+      </div>
+      <a class="item govie-round-button"
+         ng-if="passwordApproved(password) === 'ok' && notEmpty(alias) === 'ok' && notEmpty(username) === 'ok'"
+         ng-click="createUser(alias, username, password)">Register</a>
     </div>
-  </ion-content>
+    <ion-content>
 </ion-view>

@@ -16,10 +16,18 @@
   width: 40%;
   margin: 30% 0% 0% 30%;
 }
+
 .govie-logo2 {
   width: 30%;
   margin: 5% 0% 30% 35%;
 }
+
+.govie-licence {
+  width: 80%;
+  text-align: center;
+  margin: 10% 0% 0% 10%;
+}
+
 a.govie-button {
   background-color: #fc3159;
   font-weight: bold;
@@ -28,8 +36,20 @@ a.govie-button {
   padding-left: 40%;
 }
 
+.govie-round-button {
+  background-color: #fc3159;
+  width: 40%;
+  font-weight: bold;
+  color: white !important;
+  font-family: "Helvetica Neue";
+  text-align: center;
+  margin-left: 30%;
+  margin-top: 10%;
+  border-radius: 7%
+}
+
 i.govie-login {
-position: absolute;
+  position: absolute;
   top: 15%;
   left: 15%;
   right: 0%;
@@ -40,7 +60,7 @@ position: absolute;
 }
 
 i.govie-new {
-position: absolute;
+  position: absolute;
   top: 15%;
   left: 15%;
   right: 0%;
@@ -63,7 +83,60 @@ position: absolute;
   top: 0;
 }
 
+.govie-header {
+  background-color: #fc3159 !important;
+}
+
+.govie-header .title {
+  font-weight: bold;
+  color: white !important;
+  font-family: "Helvetica Neue";
+}
+
 .govie-splash img {
   width: 30%;
   margin: 35%;
+}
+
+.govie-create-user-view i.ok {
+  background: url('../img/govie_OK_gron.png');
+  position: absolute;
+  top: 15%;
+  left: 90%;
+  right: 0%;
+  bottom: 15%;
+  background-repeat: no-repeat;
+  background-size: 70%;
+}
+
+.govie-create-user-view i.nok {
+  background: url('../img/govie_NO_rod.png');
+  position: absolute;
+  top: 15%;
+  left: 90%;
+  right: 0%;
+  bottom: 15%;
+  background-repeat: no-repeat;
+  background-size: 70%;
+}
+
+#input_container {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  background: #ddd;
+}
+
+#input {
+  height: 20px;
+  margin: 0;
+  padding-left: 30px;
+}
+
+#input_img {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  width: 10px;
+  height: 10px;
 }
