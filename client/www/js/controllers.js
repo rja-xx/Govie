@@ -1,6 +1,6 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ui.router'])
 
-  .controller('WallCtrl', function ($scope, $http, $localStorage, $ionicModal) {
+  .controller('WallCtrl', function ($state, $scope, $http, $localStorage, $ionicModal) {
     $scope.$on('$ionicView.enter', function (e) {
       var token = $localStorage.get("govie-auth-token");
       $http.defaults.headers.common['x-access-token'] = token;
@@ -20,6 +20,9 @@ angular.module('starter.controllers', [])
         $ionicModal.fromTemplateUrl('templates/choose.html').then(function (modal) {
           $scope.modal = modal;
           modal.show();
+        });
+        $scope.$on('modal.hidden', function () {
+          $state.go('tab.profile', {}, {reload: true});
         });
       }
     });
@@ -112,7 +115,7 @@ angular.module('starter.controllers', [])
           $localStorage.set("govie-auth-token", res.data.token);
           $http.defaults.headers.common['x-access-token'] = res.data.token;
           $scope.modal.hide();
-          $state.go('tab.wall', {}, {reload: true});
+          $state.go('tab.profile', {}, {reload: true});
         },
         function (err) {
           if (err.status === 400) {
@@ -125,8 +128,8 @@ angular.module('starter.controllers', [])
   })
 
   .controller('LoginCtrl', function ($state, $scope, $http, $localStorage) {
-    $scope.wipeErrors = function(){
-        $scope.errors = [];
+    $scope.wipeErrors = function () {
+      $scope.errors = [];
     };
     $scope.login = function (username, password) {
       var request = {username: username, password: password};
@@ -142,7 +145,14 @@ angular.module('starter.controllers', [])
     };
   })
   .controller('AccountCtrl', function ($scope) {
-    $scope.settings = {
-      enableFriends: true
+    $scope.logout = function () {
+      $localStorage.set("govie-auth-token", '');
     };
+  })
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage) {
+    $scope.$on('$ionicView.enter', function (e) {
+      $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $scope.profile = res.data.profile;
+      });
+    });
   });

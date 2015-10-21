@@ -8,6 +8,7 @@ var express = require('express');        // call express
 var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var User = require('./model/user');
+var Profile = require('./model/profile');
 var Config = require('./config')
 var uuid = require('uuid');
 var mongoose = require('mongoose');
@@ -16,11 +17,11 @@ var jwt = require('jsonwebtoken');
 var cors = require('cors');
 var owasp = require('owasp-password-strength-test');
 owasp.config({
-    allowPassphrases       : true,
-    maxLength              : 128,
-    minLength              : 6,
-    minPhraseLength        : 10,
-    minOptionalTestsToPass : 2,
+    allowPassphrases: true,
+    maxLength: 128,
+    minLength: 6,
+    minPhraseLength: 10,
+    minOptionalTestsToPass: 2,
 });
 mongoose.connect(Config.database);
 // configure app to use bodyParser()
@@ -47,7 +48,7 @@ app.post('/addUser', function (req, res) {
     console.log("adding user: " + JSON.stringify(req.body));
 
     var passwordStrength = owasp.test(req.body.password);
-    if(!passwordStrength.strong){
+    if (!passwordStrength.strong) {
         res.status(400).json({message: "Weak password", errors: passwordStrength.errors});
         return res;
     }
@@ -64,17 +65,26 @@ app.post('/addUser', function (req, res) {
             res.send(err);
             return res;
         } else {
-            var token = jwt.sign(user, app.get('superSecret'), {
-                expiresInMinutes: 1
+
+            var profile = new Profile();
+            profile.username = user.username;
+            profile.followers = 0;
+            profile.following = 0;
+            profile.movies = 0
+            profile.save(function (err) {
+                var token = jwt.sign(user, app.get('superSecret'), {
+                    expiresInMinutes: 1
+                });
+                res.status(200).json({token: token});
+                return res;
             });
-            res.status(200).json({token: token});
-            return res;
         }
-    })
+    });
+
 });
 
 app.post('/authenticate', function (req, res) {
-    console.log("Authenticate user: "+ JSON.stringify(req.body))
+    console.log("Authenticate user: " + JSON.stringify(req.body))
     var password = req.body.password;
     User.find({username: req.body.username}, function (err, user) {
         if (user[0].password === crypto.createHmac('sha1', user[0].salt).update(password).digest('hex')) {
@@ -105,12 +115,12 @@ router.use(function (req, res, next) {
             if (err) {
                 return res.json({success: false, message: 'Failed to authenticate token.'});
             } else {
-                if(Array.isArray(decoded)) {
+                if (Array.isArray(decoded)) {
                     req.decoded = decoded[0];
-                }else{
+                } else {
                     req.decoded = decoded;
                 }
-                    next();
+                next();
             }
         });
 
@@ -129,6 +139,13 @@ router.use(function (req, res, next) {
 router.route('/wall').get(function (req, res) {
     console.log("returning wall");
     res.json({message: 'you got wall!', username: req.decoded.username});
+});
+
+router.route('/profile').get(function (req, res) {
+    console.log("returning profile");
+    Profile.find({username: req.decoded.username}, function (err, profile) {
+        res.json({profile: profile[0]});
+    });
 });
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)

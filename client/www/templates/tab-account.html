@@ -1,9 +1,6 @@
-<ion-view view-title="Account">
+<ion-view view-title="Account" ng-controller="AccountCtrl">
   <ion-content>
-    <ion-list>
-    <ion-toggle  ng-model="settings.enableFriends">
-        Enable Friends
-    </ion-toggle>
-    </ion-list>
+    <a class="item govie-round-button"
+       ng-click="logout()">Logg ut</a>
   </ion-content>
 </ion-view>
