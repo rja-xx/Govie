@@ -111,7 +111,11 @@ i.govie-new {
   height: 15%;
 }
 
-.govie-header .title {
+.govie-normal-header {
+  background-color: #fc3159 !important;
+}
+
+.govie-normal-header .title {
   font-weight: bold;
   color: white !important;
   font-family: "Helvetica Neue";
