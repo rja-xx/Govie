@@ -96,6 +96,16 @@ i.govie-new {
   top: 0;
 }
 
+.govie-logo-header {
+  background-color: #fc3159 !important;
+  height: 10%;
+}
+
+.govie-logo-header img {
+  width: 26%;
+  margin: 4% 0% 2% 37%;
+}
+
 .govie-header {
   background-color: #fc3159 !important;
   height: 15%;
@@ -115,6 +125,12 @@ i.govie-new {
 
 .govie-large-header {
   top: 15%
+}
+
+.govie-search-view{
+  float: right;
+  height: 50%;
+  padding-top: 15%;
 }
 
 .govie-profile {
@@ -163,6 +179,23 @@ i.govie-new {
   font-family: "Helvetica Neue";
   font-size: 60% !important;
   color: #707070;
+}
+
+.govie-search-view button {
+  width: 100%;
+  background: url('../img/govie_logga.png');
+  background-repeat: no-repeat;
+  background-size: 7%;
+  background-position-x: 5%;
+  background-position-y: 50%;
+}
+
+.govie-search-view input {
+
+}
+
+.govie-search-view img {
+  width: 100%;
 }
 
 .govie-profile-img img {

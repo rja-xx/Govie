@@ -1,0 +1,16 @@
+<ion-view hide-nav-bar="true" view-title="Search">
+  <div class="bar bar-header bar-light govie-logo-header">
+    <img src="../img/govie_hela_loggan_vit.png">
+  </div>
+  <ion-content class="govie-search-view">
+    <label class="item item-input">
+      <i class="icon ion-search placeholder-icon"></i>
+      <input type="search" placeholder="Search" ng-model="term" ng-change="search(term)">
+    </label>
+    <ul ng-if="hits.length > 0">
+      <li ng-repeat="hit in hits">
+        <button class="item" ng-click="openProfile(hit.username)">{{hit.name}}</button>
+      </li>
+    </ul>
+  </ion-content>
+</ion-view>

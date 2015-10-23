@@ -149,6 +149,16 @@ angular.module('starter.controllers', ['ui.router'])
       $localStorage.set("govie-auth-token", '');
     };
   })
+  .controller('SearchCtrl', function ($scope) {
+    $scope.openProfile = function(username){
+      console.log('go to '+username);
+    };
+
+    $scope.search = function(value){
+      console.log(value);
+      $scope.hits = [{name: 'roger', username: 'roger'}, {name: 'roger3', username: 'roger3'}];
+    };
+  })
   .controller('ProfileCtrl', function ($scope, $http, $localStorage) {
     $scope.$on('$ionicView.enter', function (e) {
       $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
