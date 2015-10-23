@@ -16,7 +16,7 @@
         <input type="password" ng-model="password" tabindex="3" placeholder="Create a password">
         <i ng-class="passwordApproved(password)"></i>
       </label>
-      <ul ng-if="errors.length > 0">
+      <ul ng-if="errors.length > 0" class="govie-errors">
         <li ng-repeat="error in errors">
           {{error}}
         </li>

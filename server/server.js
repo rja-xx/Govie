@@ -12,6 +12,7 @@ var Profile = require('./model/profile');
 var Config = require('./config')
 var uuid = require('uuid');
 var mongoose = require('mongoose');
+var _ = require('underscore');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
@@ -46,11 +47,10 @@ var port = process.env.PORT || 8080;        // set our port
 
 app.post('/addUser', function (req, res) {
     console.log("adding user: " + JSON.stringify(req.body));
-
+    var errors = [];
     var passwordStrength = owasp.test(req.body.password);
     if (!passwordStrength.strong) {
-        res.status(400).json({message: "Weak password", errors: passwordStrength.errors});
-        return res;
+        errors = passwordStrength.errors;
     }
 
     var user = new User();
@@ -59,28 +59,49 @@ app.post('/addUser', function (req, res) {
     user.salt = uuid.v4();
     user.password = req.body.password;
     user.password = crypto.createHmac('sha1', user.salt).update(user.password).digest('hex');
-
-    user.save(function (err) {
-        if (err) {
-            res.send(err);
-            return res;
-        } else {
-
-            var profile = new Profile();
-            profile.username = user.username;
-            profile.followers = 0;
-            profile.following = 0;
-            profile.movies = 0
-            profile.save(function (err) {
-                var token = jwt.sign(user, app.get('superSecret'), {
-                    expiresInMinutes: 1
+    User.find({$or: [{username: user.username}, {alias: user.alias}]}, function (err, users) {
+            if (users.length > 0) {
+                _.each(users, function (u) {
+                    if (u.username === user.username) {
+                        errors.push('Username is in use')
+                    }
+                    if(u.alias === user.alias){
+                        errors.push('Alias is in use')
+                    }
                 });
-                res.status(200).json({token: token});
+            }
+            if (errors.length > 0) {
+                res.status(400).json({message: 'Client error', errors: errors});
                 return res;
-            });
+            } else {
+                user.save(function (err) {
+                    if (err) {
+                        res.status(500).json({message: "Server error!", errors: [err]});
+                        return res;
+                    } else {
+                        var profile = new Profile();
+                        profile.username = user.username;
+                        profile.followers = [];
+                        profile.following = [];
+                        profile.movies = [];
+                        profile.save(function (err) {
+                            if (err) {
+                                res.status(500).json({message: "Server error!", errors: [err]});
+                                return res;
+                            }
+                            else {
+                                var token = jwt.sign(user, app.get('superSecret'), {
+                                    expiresInMinutes: 1
+                                });
+                                res.status(200).json({token: token});
+                                return res;
+                            }
+                        });
+                    }
+                });
+            }
         }
-    });
-
+    );
 });
 
 app.post('/authenticate', function (req, res) {

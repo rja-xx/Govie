@@ -121,7 +121,7 @@ angular.module('starter.controllers', ['ui.router'])
           if (err.status === 400) {
             $scope.errors = err.data.errors;
           } else {
-            console.log(JSON.stringify(err));
+            console.log(JSON.stringify(err));//todo show proper error
           }
         });
     }

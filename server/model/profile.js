@@ -3,9 +3,9 @@ var Schema       = mongoose.Schema;
 
 var ProfileSchema   = new Schema({
     username: String,
-    followers: Number,
-    following: Number,
-    movies: Number,
+    followers: [String],
+    following: [String],
+    movies: [String],
 });
 
 module.exports = mongoose.model('Profile', ProfileSchema);

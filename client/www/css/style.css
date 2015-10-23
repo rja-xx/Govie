@@ -32,14 +32,13 @@
   background-color: #fc3159;
 }
 
-.govie-errors {
-  width: 80%;
-  font-size: 150%;
-  font-weight: bold;
+.govie-errors li {
   font-family: "Helvetica Neue";
   text-align: center;
-  color: darkred !important;
-  margin: 10% 0% 0% 10%;
+  color: white !important;
+  border-top: 1px solid white;
+  background-color: #fc3159;;
+  padding: 2% 2% 2% 2%;
 }
 
 a.govie-button {
