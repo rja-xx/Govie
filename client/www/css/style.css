@@ -98,12 +98,76 @@ i.govie-new {
 
 .govie-header {
   background-color: #fc3159 !important;
+  height: 15%;
 }
 
 .govie-header .title {
   font-weight: bold;
   color: white !important;
   font-family: "Helvetica Neue";
+}
+
+.govie-header img {
+  height: auto;
+  width: 12%;
+  margin: 8% 0% 3% 44%;
+}
+
+.govie-large-header {
+  top: 15%
+}
+
+.govie-profile {
+  float: right;
+  height: 50%;
+}
+
+.govie-profile-img {
+  width: 20%;
+  float: left;
+}
+
+.govie-profile-info {
+  width: 75%;
+  float: right;
+  margin-left: 5%;
+  padding-top: 10%;
+}
+
+.govie-profile-info .username {
+  font-weight: bold;
+  color: #363636;
+  font-family: "Helvetica Neue";
+  font-size: 140%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+
+.govie-profile-info ul {
+  padding-top: 5%;
+}
+
+.govie-profile-info ul li {
+  list-style-type: none;
+  display: inline-block;
+  font-weight: bold;
+  color: #363636;
+  font-family: "Helvetica Neue";
+  font-size: 140%;
+  width: 15%;
+
+}
+
+.govie-profile-info ul li span {
+  font-weight: normal;
+  font-family: "Helvetica Neue";
+  font-size: 60% !important;
+  color: #707070;
+}
+
+.govie-profile-img img {
+  width: 100%;
+  padding: 10% 10% 40% 10%;
 }
 
 .govie-splash img {

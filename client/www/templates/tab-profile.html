@@ -1,9 +1,24 @@
-<ion-view view-title="Profile">
-  <ion-content>
-    <ul>
-      <li>Followers: {{profile.followers.length}}</li>
-      <li>Follows: {{profile.following.length}}</li>
-      <li>Movies: {{profile.movies.length}}</li>
-    </ul>
+<ion-view hide-nav-bar="true" view-title="Profile">
+  <div class="bar bar-header bar-light govie-header">
+    <img src="../img/govie_logga_vit.png">
+  </div>
+  <ion-content class="govie-large-header">
+    <div class="govie-profile">
+      <div class="govie-profile-img">
+        <img src="../img/govie_logga.png">
+      </div>
+      <div class="govie-profile-info">
+        <span class="username">{{profile.username}}</span>
+        <ul>
+          <li>{{profile.movies.length}}<br><span>Movies</span></li>
+          <li>{{profile.following.length}}<br><span>Follows</span></li>
+          <li>{{profile.followers.length}}<br><span>Followers</span></li>
+        </ul>
+      </div>
+    </div>
+    <hr>
+    <div style="margin: 40% 32% 0% 33%; color: #777777">
+      Start saving your movies!!
+    </div>
   </ion-content>
 </ion-view>
