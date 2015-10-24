@@ -115,7 +115,7 @@ angular.module('starter.controllers', ['ui.router'])
           $localStorage.set("govie-auth-token", res.data.token);
           $http.defaults.headers.common['x-access-token'] = res.data.token;
           $scope.modal.hide();
-          $state.go('tab.profile', {}, {reload: true});
+          $state.go('tab.profile', {profile: ''}, {reload: true});
         },
         function (err) {
           if (err.status === 400) {
@@ -149,20 +149,27 @@ angular.module('starter.controllers', ['ui.router'])
       $localStorage.set("govie-auth-token", '');
     };
   })
-  .controller('SearchCtrl', function ($scope) {
-    $scope.openProfile = function(username){
-      console.log('go to '+username);
+  .controller('SearchCtrl', function ($scope, $http, $localStorage, $state) {
+    $scope.openProfile = function (profile) {
+      $state.go('tab.profile', {profile: JSON.stringify(profile)}, {reload: true});
     };
-
-    $scope.search = function(value){
+    $scope.term = '';
+    $scope.search = function (value) {
       console.log(value);
-      $scope.hits = [{name: 'roger', username: 'roger'}, {name: 'roger3', username: 'roger3'}];
+      $http.get('http://213.67.22.6:8976/govie/search?term=' + value, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $scope.hits = res.data.profiles;
+      });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage) {
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams) {
     $scope.$on('$ionicView.enter', function (e) {
-      $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-        $scope.profile = res.data.profile;
-      });
+      if ($stateParams.profile.length > 15) {
+        $scope.profile = JSON.parse($stateParams.profile);
+        console.log($scope.profile);
+      } else {
+        $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+          $scope.profile = res.data.profile;
+        });
+      }
     });
   });

@@ -9,7 +9,7 @@
     </label>
     <ul ng-if="hits.length > 0">
       <li ng-repeat="hit in hits">
-        <button class="item" ng-click="openProfile(hit.username)">{{hit.name}}</button>
+        <button class="item" ng-click="openProfile(hit)">{{hit.username}}</button>
       </li>
     </ul>
   </ion-content>

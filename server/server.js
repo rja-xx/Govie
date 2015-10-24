@@ -9,8 +9,9 @@ var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var User = require('./model/user');
 var Profile = require('./model/profile');
-var Config = require('./config')
+var Config = require('./config');
 var uuid = require('uuid');
+var url = require('url');
 var mongoose = require('mongoose');
 var _ = require('underscore');
 var crypto = require('crypto');
@@ -160,12 +161,24 @@ router.use(function (req, res, next) {
 router.route('/wall').get(function (req, res) {
     console.log("returning wall");
     res.json({message: 'you got wall!', username: req.decoded.username});
+    return res;
 });
 
 router.route('/profile').get(function (req, res) {
     console.log("returning profile");
     Profile.find({username: req.decoded.username}, function (err, profile) {
         res.json({profile: profile[0]});
+        return res;
+    });
+});
+
+router.route('/search').get(function (req, res) {
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
+    console.log("searching profiles matching " + query.term);
+    Profile.find({"username": {'$regex': ".*"+query.term+".*"}}, function (err, profiles) {
+        res.json({profiles: profiles});
+        return res;
     });
 });
 

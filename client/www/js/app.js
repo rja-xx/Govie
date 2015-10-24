@@ -93,7 +93,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       })
 
       .state('tab.profile', {
-        url: '/profile',
+        url: '/profile/:profile',
         views: {
           'tab-profile': {
             templateUrl: 'templates/tab-profile.html',
