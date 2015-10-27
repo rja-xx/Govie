@@ -66,7 +66,7 @@ app.post('/addUser', function (req, res) {
                     if (u.username === user.username) {
                         errors.push('Username is in use')
                     }
-                    if(u.alias === user.alias){
+                    if (u.alias === user.alias) {
                         errors.push('Alias is in use')
                     }
                 });
@@ -75,7 +75,7 @@ app.post('/addUser', function (req, res) {
                 res.status(400).json({message: 'Client error', errors: errors});
                 return res;
             } else {
-                user.save(function (err) {
+                user.save(function (err, updatedUser) {
                     if (err) {
                         res.status(500).json({message: "Server error!", errors: [err]});
                         return res;
@@ -94,7 +94,7 @@ app.post('/addUser', function (req, res) {
                                 var token = jwt.sign(user, app.get('superSecret'), {
                                     expiresInMinutes: 1
                                 });
-                                res.status(200).json({token: token});
+                                res.status(200).json({token: token, profile: profile});
                                 return res;
                             }
                         });
@@ -171,12 +171,63 @@ router.route('/profile').get(function (req, res) {
         return res;
     });
 });
+router.route('/follow').post(function (req, res) {
+    Profile.update(
+        {username: req.decoded.username},
+        {$push: {following: req.body.username}},
+        {upsert: true},
+        function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                Profile.update(
+                    {username: req.body.username},
+                    {$push: {followers: req.decoded.username}},
+                    {upsert: true},
+                    function (err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            res.status(200).json({message: 'ok'});
+                            return res;
+                        }
+                    }
+                );
+            }
+        });
+});
+router.route('/unfollow').post(function (req, res) {
+    Profile.update(
+        {username: req.decoded.username},
+        {$pull: {following: req.body.username}},
+        {upsert: true},
+        function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                Profile.update(
+                    {username: req.body.username},
+                    {$pull: {following: req.decoded.username}},
+                    {upsert: true},
+                    function (err) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            res.status(200).json({message: 'ok'});
+                            return res;
+                        }
+                    }
+                );
+            }
+        }
+    );
+});
 
 router.route('/search').get(function (req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
     console.log("searching profiles matching " + query.term);
-    Profile.find({"username": {'$regex': ".*"+query.term+".*"}}, function (err, profiles) {
+    Profile.find({"username": {'$regex': ".*" + query.term + ".*"}}, function (err, profiles) {
         res.json({profiles: profiles});
         return res;
     });

@@ -8,10 +8,12 @@
         <img src="../img/govie_logga.png">
       </div>
       <div class="govie-profile-info">
+        <span ng-if="!follows(profile.username)" ng-click="follow(profile.username)" class="follow"></span>
+        <span ng-if="follows(profile.username)" ng-click="unfollow(profile.username)" class="follows"></span>
         <span class="username">{{profile.username}}</span>
         <ul>
           <li>{{profile.movies.length}}<br><span>Movies</span></li>
-          <li>{{profile.following.length}}<br><span>Follows</span></li>
+          <li>{{profile.follows.length}}<br><span>Follows</span></li>
           <li>{{profile.followers.length}}<br><span>Followers</span></li>
         </ul>
       </div>

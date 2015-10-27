@@ -115,6 +115,28 @@ i.govie-new {
   background-color: #fc3159 !important;
 }
 
+.govie-profile-info .follow {
+  float: right;
+  margin-top: -10%;
+  margin-right: 5%;
+  background-image: url("../img/govie_folj.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 15%;
+  height: 50px;
+}
+
+.govie-profile-info .follows {
+  float: right;
+  margin-top: -10%;
+  margin-right: 5%;
+  background-image: url("../img/govie_foljer.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 15%;
+  height: 50px;
+}
+
 .govie-normal-header .title {
   font-weight: bold;
   color: white !important;

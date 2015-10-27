@@ -161,13 +161,38 @@ angular.module('starter.controllers', ['ui.router'])
       });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams) {
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _) {
+    $scope.following = false;
+    $scope.follows = function () {
+      return $scope.following;
+    };
+    $scope.follow = function (username) {
+      $http.post('http://213.67.22.6:8976/govie/follow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+          $scope.following = true;
+          $scope.profile.followers.pop();
+          $scope.profile.followers.push("bogus");
+        },
+        function (err) {
+          console.log(JSON.stringify(err));//todo show proper error
+        });
+    };
+    $scope.unfollow = function (username) {
+      $http.post('http://213.67.22.6:8976/govie/unfollow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+          $scope.following = false;
+          $scope.profile.followers.pop();
+        },
+        function (err) {
+          console.log(JSON.stringify(err));//todo show proper error
+        });
+    };
     $scope.$on('$ionicView.enter', function (e) {
       if ($stateParams.profile.length > 15) {
         $scope.profile = JSON.parse($stateParams.profile);
-        console.log($scope.profile);
+        $scope.following = _.contains($scope.profile.followers, $localStorage.get("govie-profile").username);
       } else {
         $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+          $localStorage.set("govie-profile", res.data.profile);
+          $scope.ownProfile = res.data.profile;
           $scope.profile = res.data.profile;
         });
       }
