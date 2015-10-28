@@ -174,7 +174,7 @@ router.route('/profile').get(function (req, res) {
 router.route('/follow').post(function (req, res) {
     Profile.update(
         {username: req.decoded.username},
-        {$push: {following: req.body.username}},
+        {$push: {follows: req.body.username}},
         {upsert: true},
         function (err) {
             if (err) {
@@ -199,7 +199,7 @@ router.route('/follow').post(function (req, res) {
 router.route('/unfollow').post(function (req, res) {
     Profile.update(
         {username: req.decoded.username},
-        {$pull: {following: req.body.username}},
+        {$pull: {follows: req.body.username}},
         {upsert: true},
         function (err) {
             if (err) {
@@ -207,7 +207,7 @@ router.route('/unfollow').post(function (req, res) {
             } else {
                 Profile.update(
                     {username: req.body.username},
-                    {$pull: {following: req.decoded.username}},
+                    {$pull: {followers: req.decoded.username}},
                     {upsert: true},
                     function (err) {
                         if (err) {
