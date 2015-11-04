@@ -13,6 +13,7 @@ var Config = require('./config');
 var uuid = require('uuid');
 var url = require('url');
 var mongoose = require('mongoose');
+var mosca = require('mosca');
 var _ = require('underscore');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
@@ -26,6 +27,66 @@ owasp.config({
     minOptionalTestsToPass: 2,
 });
 mongoose.connect(Config.database);
+var pushSettings = {
+    port: 1883
+};
+
+var pushServer = new mosca.Server(pushSettings);
+pushServer.on('ready', setupPush);
+
+// fired when the mqtt server is ready
+function setupPush() {
+    console.log('Mosca server is up and running')
+}
+
+
+// fired whena  client is connected
+pushServer.on('clientConnected', function(client) {
+    console.log('client connected', client.id);
+});
+
+// fired when a message is received
+pushServer.on('published', function(packet, client) {
+    console.log('Published : ', packet.payload);
+});
+
+// fired when a client subscribes to a topic
+pushServer.on('subscribed', function(topic, client) {
+    console.log('subscribed : ', topic);
+});
+
+// fired when a client subscribes to a topic
+pushServer.on('unsubscribed', function(topic, client) {
+    console.log('unsubscribed : ', topic);
+});
+
+// fired when a client is disconnecting
+pushServer.on('clientDisconnecting', function(client) {
+    console.log('clientDisconnecting : ', client.id);
+});
+
+// fired when a client is disconnected
+pushServer.on('clientDisconnected', function(client) {
+    console.log('clientDisconnected : ', client.id);
+});
+
+//server.published = function(packet, client, cb) {
+//    if (packet.topic.indexOf('echo') === 0) {
+//        return cb();
+//    }
+//
+//    var newPacket = {
+//        topic: 'echo/' + packet.topic,
+//        payload: packet.payload,
+//        retain: packet.retain,
+//        qos: packet.qos
+//    };
+//
+//    console.log('newPacket', newPacket);
+//
+//    server.publish(newPacket, cb);
+//};
+
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({extended: true}));
@@ -172,6 +233,10 @@ router.route('/profile').get(function (req, res) {
     });
 });
 router.route('/follow').post(function (req, res) {
+    if(req.decoded.username === req.body.username){
+        res.status(401).json({message: 'Cant follow yourself'});
+        return res;
+    }
     Profile.update(
         {username: req.decoded.username},
         {$push: {follows: req.body.username}},

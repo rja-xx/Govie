@@ -185,15 +185,20 @@ angular.module('starter.controllers', ['ui.router'])
           console.log(JSON.stringify(err));//todo show proper error
         });
     };
+    $scope.isOwnProfile = false;
     $scope.$on('$ionicView.enter', function (e) {
       if ($stateParams.profile.length > 15) {
         $scope.profile = JSON.parse($stateParams.profile);
-        $scope.following = _.contains($scope.profile.followers, $localStorage.get("govie-profile").username);
+        $scope.following = _.contains(
+          _.map($scope.profile.followers, function (follower) {
+            return follower.name
+          }), $localStorage.get("govie-profile").username);
       } else {
         $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $localStorage.set("govie-profile", res.data.profile);
           $scope.ownProfile = res.data.profile;
           $scope.profile = res.data.profile;
+          $scope.isOwnProfile = true;
         });
       }
     });
