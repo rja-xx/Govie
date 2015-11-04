@@ -293,7 +293,9 @@ router.route('/search').get(function (req, res) {
     var query = url_parts.query;
     console.log("searching profiles matching " + query.term);
     Profile.find({"username": {'$regex': ".*" + query.term + ".*"}}, function (err, profiles) {
-        res.json({profiles: profiles});
+        res.json({profiles: _.filter(profiles, function (profile) {
+            return profile.username !== req.decoded.username;
+        })});
         return res;
     });
 });
