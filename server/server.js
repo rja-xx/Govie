@@ -36,56 +36,39 @@ pushServer.on('ready', setupPush);
 
 // fired when the mqtt server is ready
 function setupPush() {
-    console.log('Mosca server is up and running')
+    console.log('Mosca server is up and running on port 1883')
 }
 
 
 // fired whena  client is connected
-pushServer.on('clientConnected', function(client) {
+pushServer.on('clientConnected', function (client) {
     console.log('client connected', client.id);
 });
 
 // fired when a message is received
-pushServer.on('published', function(packet, client) {
+pushServer.on('published', function (packet, client) {
     console.log('Published : ', packet.payload);
 });
 
 // fired when a client subscribes to a topic
-pushServer.on('subscribed', function(topic, client) {
+pushServer.on('subscribed', function (topic, client) {
     console.log('subscribed : ', topic);
 });
 
 // fired when a client subscribes to a topic
-pushServer.on('unsubscribed', function(topic, client) {
+pushServer.on('unsubscribed', function (topic, client) {
     console.log('unsubscribed : ', topic);
 });
 
 // fired when a client is disconnecting
-pushServer.on('clientDisconnecting', function(client) {
+pushServer.on('clientDisconnecting', function (client) {
     console.log('clientDisconnecting : ', client.id);
 });
 
 // fired when a client is disconnected
-pushServer.on('clientDisconnected', function(client) {
+pushServer.on('clientDisconnected', function (client) {
     console.log('clientDisconnected : ', client.id);
 });
-
-//server.published = function(packet, client, cb) {
-//    if (packet.topic.indexOf('echo') === 0) {
-//        return cb();
-//    }
-//
-//    var newPacket = {
-//        topic: 'echo/' + packet.topic,
-//        payload: packet.payload,
-//        retain: packet.retain,
-//        qos: packet.qos
-//    };
-//
-//    console.log('newPacket', newPacket);
-//
-//    server.publish(newPacket, cb);
-//};
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -233,7 +216,7 @@ router.route('/profile').get(function (req, res) {
     });
 });
 router.route('/follow').post(function (req, res) {
-    if(req.decoded.username === req.body.username){
+    if (req.decoded.username === req.body.username) {
         res.status(401).json({message: 'Cant follow yourself'});
         return res;
     }
@@ -253,8 +236,14 @@ router.route('/follow').post(function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            res.status(200).json({message: 'ok'});
-                            return res;
+                            var newPacket = {
+                                topic: req.body.username + '/follow',
+                                payload: {username: req.decoded.username}
+                            };
+                            pushServer.publish(newPacket, function () {
+                                res.status(200).json({message: 'ok'});
+                                return res;
+                            });
                         }
                     }
                 );
@@ -278,8 +267,14 @@ router.route('/unfollow').post(function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            res.status(200).json({message: 'ok'});
-                            return res;
+                            var newPacket = {
+                                topic: req.body.username + '/unfollow',
+                                payload: {username: req.decoded.username}
+                            };
+                            pushServer.publish(newPacket, function () {
+                                res.status(200).json({message: 'ok'});
+                                return res;
+                            });
                         }
                     }
                 );
@@ -293,9 +288,11 @@ router.route('/search').get(function (req, res) {
     var query = url_parts.query;
     console.log("searching profiles matching " + query.term);
     Profile.find({"username": {'$regex': ".*" + query.term + ".*"}}, function (err, profiles) {
-        res.json({profiles: _.filter(profiles, function (profile) {
-            return profile.username !== req.decoded.username;
-        })});
+        res.json({
+            profiles: _.filter(profiles, function (profile) {
+                return profile.username !== req.decoded.username;
+            })
+        });
         return res;
     });
 });
