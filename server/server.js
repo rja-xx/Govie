@@ -28,7 +28,7 @@ owasp.config({
 });
 mongoose.connect(Config.database);
 var pushSettings = {
-    port: 1883
+    port: 3000
 };
 
 var pushServer = new mosca.Server(pushSettings);
@@ -36,7 +36,7 @@ pushServer.on('ready', setupPush);
 
 // fired when the mqtt server is ready
 function setupPush() {
-    console.log('Mosca server is up and running on port 1883')
+    console.log('Mosca server is up and running on port 3000')
 }
 
 
@@ -240,7 +240,7 @@ router.route('/follow').post(function (req, res) {
                                 topic: req.body.username + '/follow',
                                 payload: {username: req.decoded.username}
                             };
-                            pushServer.publish(newPacket, function () {
+                            mqttServ.publish(newPacket, function () {
                                 res.status(200).json({message: 'ok'});
                                 return res;
                             });
@@ -271,7 +271,7 @@ router.route('/unfollow').post(function (req, res) {
                                 topic: req.body.username + '/unfollow',
                                 payload: {username: req.decoded.username}
                             };
-                            pushServer.publish(newPacket, function () {
+                            mqttServ.publish(newPacket, function () {
                                 res.status(200).json({message: 'ok'});
                                 return res;
                             });

@@ -161,7 +161,7 @@ angular.module('starter.controllers', ['ui.router'])
       });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _) {
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, mqtt) {
     $scope.following = false;
     $scope.follows = function () {
       return $scope.following;
@@ -201,5 +201,13 @@ angular.module('starter.controllers', ['ui.router'])
           $scope.isOwnProfile = true;
         });
       }
+      client = mqtt.createClient(8734, '213.67.22.6');
+
+      client.subscribe($scope.profile.username+"/unfollow");
+      client.subscribe($scope.profile.username+"/follow");
+
+      client.on('message', function(topic, message) {
+        console.log(message);
+      });
     });
   });
