@@ -102,8 +102,13 @@ i.govie-new {
 }
 
 .govie-logo-header img {
-  width: 26%;
-  margin: 4% 0% 2% 37%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  height: 50%;
 }
 
 .govie-header {
@@ -144,9 +149,13 @@ i.govie-new {
 }
 
 .govie-header img {
-  height: auto;
-  width: 12%;
-  margin: 8% 0% 3% 44%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  height: 50%;
 }
 
 .govie-large-header {
@@ -156,12 +165,13 @@ i.govie-new {
 .govie-search-view{
   float: right;
   height: 50%;
-  padding-top: 15%;
+  padding-top: 13%;
 }
 
 .govie-profile {
   float: right;
-  height: 50%;
+  height: 100%;
+  width: 100%;
 }
 
 .govie-profile-img {
@@ -205,6 +215,7 @@ i.govie-new {
   font-family: "Helvetica Neue";
   font-size: 60% !important;
   color: #707070;
+  height: 50px;
 }
 
 .govie-search-view button {
@@ -222,6 +233,7 @@ i.govie-new {
   font-weight: normal;
   font-family: "Helvetica Neue";
   font-size: 115% !important;
+  height: 50px;
 }
 
 .govie-search-view img {

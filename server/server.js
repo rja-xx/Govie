@@ -13,12 +13,19 @@ var Config = require('./config');
 var uuid = require('uuid');
 var url = require('url');
 var mongoose = require('mongoose');
-var mosca = require('mosca');
 var _ = require('underscore');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
 var owasp = require('owasp-password-strength-test');
+var mosca = require("mosca");
+var server = new mosca.Server({
+    http: {
+        port: 3000,
+        bundle: true,
+        static: './'
+    }
+});
 owasp.config({
     allowPassphrases: true,
     maxLength: 128,
@@ -27,48 +34,6 @@ owasp.config({
     minOptionalTestsToPass: 2,
 });
 mongoose.connect(Config.database);
-var pushSettings = {
-    port: 3000
-};
-
-var pushServer = new mosca.Server(pushSettings);
-pushServer.on('ready', setupPush);
-
-// fired when the mqtt server is ready
-function setupPush() {
-    console.log('Mosca server is up and running on port 3000')
-}
-
-
-// fired whena  client is connected
-pushServer.on('clientConnected', function (client) {
-    console.log('client connected', client.id);
-});
-
-// fired when a message is received
-pushServer.on('published', function (packet, client) {
-    console.log('Published : ', packet.payload);
-});
-
-// fired when a client subscribes to a topic
-pushServer.on('subscribed', function (topic, client) {
-    console.log('subscribed : ', topic);
-});
-
-// fired when a client subscribes to a topic
-pushServer.on('unsubscribed', function (topic, client) {
-    console.log('unsubscribed : ', topic);
-});
-
-// fired when a client is disconnecting
-pushServer.on('clientDisconnecting', function (client) {
-    console.log('clientDisconnecting : ', client.id);
-});
-
-// fired when a client is disconnected
-pushServer.on('clientDisconnected', function (client) {
-    console.log('clientDisconnected : ', client.id);
-});
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -240,7 +205,7 @@ router.route('/follow').post(function (req, res) {
                                 topic: req.body.username + '/follow',
                                 payload: {username: req.decoded.username}
                             };
-                            mqttServ.publish(newPacket, function () {
+                            server.publish(newPacket, function () {
                                 res.status(200).json({message: 'ok'});
                                 return res;
                             });
@@ -271,7 +236,7 @@ router.route('/unfollow').post(function (req, res) {
                                 topic: req.body.username + '/unfollow',
                                 payload: {username: req.decoded.username}
                             };
-                            mqttServ.publish(newPacket, function () {
+                            server.publish(newPacket, function () {
                                 res.status(200).json({message: 'ok'});
                                 return res;
                             });
