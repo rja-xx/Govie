@@ -5,7 +5,7 @@ angular.module('starter.controllers', ['ui.router'])
       var token = $localStorage.get("govie-auth-token");
       $http.defaults.headers.common['x-access-token'] = token;
       if (token) {
-        $http.get('http://213.67.22.6:8976/govie/wall').then(
+        $http.get('http://localhost:8080/govie/wall').then(
           function (res) {
             $scope.username = res.data.username;
             $scope.message = res.data.message;
@@ -111,7 +111,7 @@ angular.module('starter.controllers', ['ui.router'])
         password: password
       };
       console.log(request);
-      $http.post('http://213.67.22.6:8976/addUser', request).then(function (res) {
+      $http.post('http://localhost:8080/addUser', request).then(function (res) {
           $localStorage.set("govie-auth-token", res.data.token);
           $http.defaults.headers.common['x-access-token'] = res.data.token;
           $scope.modal.hide();
@@ -133,7 +133,7 @@ angular.module('starter.controllers', ['ui.router'])
     };
     $scope.login = function (username, password) {
       var request = {username: username, password: password};
-      $http.post('http://213.67.22.6:8976/authenticate', request).then(function (res) {
+      $http.post('http://localhost:8080/authenticate', request).then(function (res) {
           $localStorage.set("govie-auth-token", res.data.token);
           $http.defaults.headers.common['x-access-token'] = res.data.token;
           $scope.modal.hide();
@@ -156,7 +156,7 @@ angular.module('starter.controllers', ['ui.router'])
     $scope.term = '';
     $scope.search = function (value) {
       console.log(value);
-      $http.get('http://213.67.22.6:8976/govie/search?term=' + value, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.get('http://localhost:8080/govie/search?term=' + value, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $scope.hits = res.data.profiles;
       });
     };
@@ -167,7 +167,7 @@ angular.module('starter.controllers', ['ui.router'])
       return $scope.following;
     };
     $scope.follow = function (username) {
-      $http.post('http://213.67.22.6:8976/govie/follow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.post('http://localhost:8080/govie/follow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $scope.following = true;
           $scope.profile.followers.pop();
           $scope.profile.followers.push("bogus");
@@ -177,7 +177,7 @@ angular.module('starter.controllers', ['ui.router'])
         });
     };
     $scope.unfollow = function (username) {
-      $http.post('http://213.67.22.6:8976/govie/unfollow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.post('http://localhost:8080/govie/unfollow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $scope.following = false;
           $scope.profile.followers.pop();
         },
@@ -194,7 +194,7 @@ angular.module('starter.controllers', ['ui.router'])
             return follower.name
           }), $localStorage.get("govie-profile").username);
       } else {
-        $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $http.get('http://localhost:8080/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $localStorage.set("govie-profile", res.data.profile);
           $scope.ownProfile = res.data.profile;
           $scope.profile = res.data.profile;
