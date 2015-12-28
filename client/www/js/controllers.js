@@ -45,9 +45,10 @@ angular.module('starter.controllers', ['ui.router'])
     };
   })
 
-  .controller('ChatsCtrl', function ($localStorage) {
-    $localStorage.set("govie-auth-token", '');
-  })
+  //.controller('ChatsCtrl', function ($localStorage) {
+  //$localStorage.set("govie-auth-token", '');
+  //})
+
 
   .controller('TabCtrl', function ($ionicModal, $scope, $localStorage) {
     $scope.modal = null;
@@ -155,7 +156,6 @@ angular.module('starter.controllers', ['ui.router'])
     };
     $scope.term = '';
     $scope.search = function (value) {
-      console.log(value);
       $http.get('http://localhost:8080/govie/search?term=' + value, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $scope.hits = res.data.profiles;
       });
@@ -201,13 +201,23 @@ angular.module('starter.controllers', ['ui.router'])
           $scope.isOwnProfile = true;
         });
       }
-      client = mqtt.createClient(8734, '213.67.22.6');
-
-      client.subscribe($scope.profile.username+"/unfollow");
-      client.subscribe($scope.profile.username+"/follow");
-
-      client.on('message', function(topic, message) {
-        console.log(message);
-      });
     });
+
+
+  })
+
+  .controller('RateCtrl', function ($scope, _) {
+    $scope.rate = 0;
+    $scope.movie = {};
+    $scope.chooseMovie = function(title){
+      $scope.moviesHits = [];
+      $scope.movie.title = title;
+    };
+    $scope.searchMovie = function () {
+      $scope.moviesHits = _.filter([{title: 'Rambo'}, {title: 'Rocky'}, {title: 'Geronimo'}], function (title) {
+        if (title.title.toLowerCase().indexOf($scope.movie.title.toLowerCase()) != -1) {
+          return true;
+        }
+      })
+    };
   });

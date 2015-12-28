@@ -67,7 +67,7 @@ i.govie-login {
   left: 15%;
   right: 0%;
   bottom: 15%;
-  background-image: url("../img/govie_logga_vit.png");
+  background-image: url("../img/govie_star_gul.png");
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -78,8 +78,8 @@ i.govie-new {
   left: 15%;
   right: 0%;
   bottom: 15%;
-  background-image: url("../img/govie_star_gul.png");
   background-repeat: no-repeat;
+  background-image: url("../img/govie_logga_vit.png");
   background-size: contain;
 }
 
@@ -102,6 +102,21 @@ i.govie-new {
 }
 
 .govie-logo-header img {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  height: 50%;
+}
+
+.govie-standard-header {
+  background-color: #fc3159 !important;
+  height: 10%;
+}
+
+.govie-standard-header img {
   margin: 0;
   position: absolute;
   top: 50%;
@@ -165,7 +180,7 @@ i.govie-new {
 .govie-search-view{
   float: right;
   height: 50%;
-  padding-top: 13%;
+  padding-top: 18%;
 }
 
 .govie-profile {
@@ -206,7 +221,7 @@ i.govie-new {
   color: #363636;
   font-family: "Helvetica Neue";
   font-size: 140%;
-  width: 15%;
+  width: 22%;
 
 }
 
@@ -291,4 +306,15 @@ i.govie-new {
   left: 10px;
   width: 10px;
   height: 10px;
+}
+
+ul.rating li {
+  display: inline;
+  border: 0px;
+  background: none;
+  padding: 5px 10px;
+}
+ul.rating li i {
+  color: gray;
+  font-size: 30px;
 }

@@ -8,6 +8,7 @@ var express = require('express');        // call express
 var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var User = require('./model/user');
+var Rate = require('./model/rate');
 var Profile = require('./model/profile');
 var Config = require('./config');
 var uuid = require('uuid');
@@ -261,10 +262,23 @@ router.route('/search').get(function (req, res) {
         return res;
     });
 });
+router.route('/rate').post(function (req, res) {
+    var rate = new Rate();
+    rate.username = req.body.username;
+    rate.movie = req.body.movie;
+    rate.friends = req.body.friends;
+    rate.note = req.body.note;
+    rate.rate = req.body.rate;
+    rate.save(function () {
+        console.log("Saved rating of " + rate.movie);
+        return res;
+    });
+});
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
 router.get('/', function (req, res) {
     res.json({message: 'hooray! welcome to our api!'});
+
 });
 
 // more routes for our API will happen here
