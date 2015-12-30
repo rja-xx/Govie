@@ -264,13 +264,14 @@ router.route('/search').get(function (req, res) {
 });
 router.route('/rate').post(function (req, res) {
     var rate = new Rate();
-    rate.username = req.body.username;
+    rate.username = req.decoded.username;
     rate.movie = req.body.movie;
     rate.friends = req.body.friends;
     rate.note = req.body.note;
     rate.rate = req.body.rate;
     rate.save(function () {
         console.log("Saved rating of " + rate.movie);
+        res.status(200).json({message: 'ok'});
         return res;
     });
 });

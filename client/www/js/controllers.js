@@ -206,10 +206,10 @@ angular.module('starter.controllers', ['ui.router'])
 
   })
 
-  .controller('RateCtrl', function ($scope, _, $http, $localStorage) {
-    $scope.rate = 0;
+  .controller('RateCtrl', function ($scope, _, $http, $localStorage, $state) {
     $scope.movie = {};
     $scope.person = {};
+    $scope.request = {}
 
     $scope.chooseMovie = function(title){
       $scope.moviesHits = [];
@@ -233,6 +233,13 @@ angular.module('starter.controllers', ['ui.router'])
       });
     };
     $scope.submitRating = function(){
-      //todo
+      var rateReq = {};
+      rateReq.movie = $scope.movie.title;
+      rateReq.friends = [$scope.person.term];
+      rateReq.note = $scope.request.note;
+      rateReq.rate = $scope.request.rate;
+      $http.post('http://localhost:8080/govie/rate', rateReq, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $state.go('tab.profile', {}, {reload: true});
+      });
     };
   });
