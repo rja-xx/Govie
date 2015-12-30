@@ -15,8 +15,14 @@
       </li>
     </ul>
     <label class="item item-input">
-      <input type="text" placeholder="Tagga personer i din biljett" ng-model="persons" ng-change="searchFriend()">
+      <input type="text" placeholder="Tagga personer i din biljett" ng-model="person.term"
+             ng-change="searchFriend()">
     </label>
+    <ul ng-if="friendHits.length > 0">
+      <li ng-repeat="hit in friendHits">
+        <button class="item" ng-click="chooseFriend(hit.username)">{{hit.username}}</button>
+      </li>
+    </ul>
     <label class="item item-input">
       <textarea placeholder="Skriv en notis..." rows="4" maxlength="30" ng-model="note"></textarea>
     </label>
@@ -25,6 +31,6 @@
     <br>
     <span>Ge betyg nu eller sen</span>
     <br>
-    <a class="item govie-round-button">Govie</a>
+    <a class="item govie-round-button" ng-click="submitRating()">Govie</a>
   </ion-content>
 </ion-view>

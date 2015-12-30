@@ -206,9 +206,11 @@ angular.module('starter.controllers', ['ui.router'])
 
   })
 
-  .controller('RateCtrl', function ($scope, _) {
+  .controller('RateCtrl', function ($scope, _, $http, $localStorage) {
     $scope.rate = 0;
     $scope.movie = {};
+    $scope.person = {};
+
     $scope.chooseMovie = function(title){
       $scope.moviesHits = [];
       $scope.movie.title = title;
@@ -219,5 +221,18 @@ angular.module('starter.controllers', ['ui.router'])
           return true;
         }
       })
+    };
+
+    $scope.chooseFriend = function (username) {
+      $scope.person.term = username;
+      $scope.friendHits = [];
+    };
+    $scope.searchFriend = function () {
+      $http.get('http://localhost:8080/govie/search?term=' + $scope.person.term, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $scope.friendHits = res.data.profiles;
+      });
+    };
+    $scope.submitRating = function(){
+      //todo
     };
   });

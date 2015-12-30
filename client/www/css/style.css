@@ -318,3 +318,8 @@ ul.rating li i {
   color: gray;
   font-size: 30px;
 }
+
+.govie-rate li button {
+  width: 100%;
+  text-align: left;
+}
