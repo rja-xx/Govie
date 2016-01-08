@@ -269,11 +269,22 @@ router.route('/rate').post(function (req, res) {
     rate.friends = req.body.friends;
     rate.note = req.body.note;
     rate.rate = req.body.rate;
-    rate.save(function () {
-        console.log("Saved rating of " + rate.movie);
-        res.status(200).json({message: 'ok'});
-        return res;
-    });
+    rate.save(function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Saved rating of " + rate.movie);
+                Profile.update(
+                    {username: req.decoded.username},
+                    {$inc: {movies: 1}},
+                    {upsert: false},
+                    function (err) {
+                        res.status(200).json({"message": 'ok'});
+                        return res;
+                    });
+            }
+        }
+    );
 });
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)
@@ -291,4 +302,5 @@ app.use('/govie', router);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
+
 console.log('Magic happens on port ' + port);
