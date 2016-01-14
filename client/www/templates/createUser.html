@@ -5,15 +5,15 @@
   <ion-content class="has-header govie-create-user-view">
     <div class="list">
       <label class="item item-input item-stacked-label">
-        <input type="text" ng-model="alias" tabindex="1" placeholder="Create an alias" autocorrect="off" autocapitalize="none">
+        <input type="text" id="govie_username" ng-model="alias" tabindex="1" placeholder="Create an alias" autocorrect="off" autocapitalize="none">
         <i ng-class="notEmpty(alias)"></i>
       </label>
       <label class="item item-input item-stacked-label">
-        <input type="text" ng-change="wipeErrors()" ng-model="username" tabindex="2" placeholder="Create a username" autocorrect="off" autocapitalize="none">
+        <input type="text" id="govie_alias" ng-change="wipeErrors()" ng-model="username" tabindex="2" placeholder="Create a username" autocorrect="off" autocapitalize="none">
         <i ng-class="notEmpty(username)"></i>
       </label>
       <label class="item item-input item-stacked-label">
-        <input type="password" ng-model="password" tabindex="3" placeholder="Create a password">
+        <input type="password" id="govie_password" ng-model="password" tabindex="3" placeholder="Create a password">
         <i ng-class="passwordApproved(password)"></i>
       </label>
       <ul ng-if="errors.length > 0" class="govie-errors">
@@ -24,7 +24,7 @@
       <div class="govie-licence">
         <label>I do accept the terms of agreement.</label>
       </div>
-      <a class="item govie-round-button" tabindex="4"
+      <a class="item govie-round-button" tabindex="4" id="govie_ok_button"
          ng-if="passwordApproved(password) === 'ok' && notEmpty(alias) === 'ok' && notEmpty(username) === 'ok'"
          ng-click="createUser(alias, username, password)">Register</a>
     </div>

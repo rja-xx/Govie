@@ -94,7 +94,7 @@ app.post('/addUser', function (req, res) {
                         profile.username = user.username;
                         profile.followers = [];
                         profile.following = [];
-                        profile.movies = [];
+                        profile.movies = 0;
                         profile.save(function (err) {
                             if (err) {
                                 res.status(500).json({message: "Server error!", errors: [err]});

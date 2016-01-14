@@ -145,7 +145,7 @@ angular.module('starter.controllers', ['ui.router'])
         });
     };
   })
-  .controller('AccountCtrl', function ($scope) {
+  .controller('AccountCtrl', function ($scope, $localStorage) {
     $scope.logout = function () {
       $localStorage.set("govie-auth-token", '');
     };
@@ -161,7 +161,7 @@ angular.module('starter.controllers', ['ui.router'])
       });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, mqtt) {
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _) {
     $scope.following = false;
     $scope.follows = function () {
       return $scope.following;
@@ -169,8 +169,7 @@ angular.module('starter.controllers', ['ui.router'])
     $scope.follow = function (username) {
       $http.post('http://localhost:8080/govie/follow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $scope.following = true;
-          $scope.profile.followers.pop();
-          $scope.profile.followers.push("bogus");
+          $scope.profile.followers.push($scope.profile.name);
         },
         function (err) {
           console.log(JSON.stringify(err));//todo show proper error
@@ -191,11 +190,11 @@ angular.module('starter.controllers', ['ui.router'])
         $scope.profile = JSON.parse($stateParams.profile);
         $scope.following = _.contains(
           _.map($scope.profile.followers, function (follower) {
-            return follower.name
-          }), $localStorage.get("govie-profile").username);
+            return follower;
+          }), $localStorage.get("current-user"));
       } else {
         $http.get('http://localhost:8080/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-          $localStorage.set("govie-profile", res.data.profile);
+          $localStorage.set("current-user", res.data.profile.username);
           $scope.ownProfile = res.data.profile;
           $scope.profile = res.data.profile;
           $scope.isOwnProfile = true;
@@ -234,9 +233,9 @@ angular.module('starter.controllers', ['ui.router'])
     };
     $scope.submitRating = function(){
       var rateReq = {};
+      rateReq.note = $scope.request.note;
       rateReq.movie = $scope.movie.title;
       rateReq.friends = [$scope.person.term];
-      rateReq.note = $scope.request.note;
       rateReq.rate = $scope.request.rate;
       $http.post('http://localhost:8080/govie/rate', rateReq, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $state.go('tab.profile', {}, {reload: true});
