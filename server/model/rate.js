@@ -3,7 +3,7 @@ var Schema       = mongoose.Schema;
 
 var RateSchema   = new Schema({
     username: String,
-    movie: [String],
+    movie: String,
     friends: [String],
     note: String,
     rate: Number

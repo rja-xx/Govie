@@ -19,8 +19,14 @@
       </div>
     </div>
     <hr>
-    <div style="margin: 40% 32% 0% 33%; color: #777777">
-      Start saving your movies!!
+    <div class="list">
+      <div class="item item-thumbnail-left" ng-repeat="rate in ratings" href="#">
+        <img src="../img/movie.jpeg">
+        <h2>{{rate.movie}}</h2>
+        <rating class="govie-small-rating" ng-model="rate.rate" max="5"></rating>
+        <p>{{rate.note}}</p>
+        <p><b>Gick med:</b> <i ng-repeat="friend in rate.friends">{{friend}}</i> </p>
+      </div>
     </div>
   </ion-content>
 </ion-view>

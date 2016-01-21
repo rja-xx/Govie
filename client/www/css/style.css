@@ -323,3 +323,8 @@ ul.rating li i {
   width: 100%;
   text-align: left;
 }
+
+.govie-small-rating {
+  font-size: 20px;
+  letter-spacing: -20px;
+}

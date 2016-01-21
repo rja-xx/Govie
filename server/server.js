@@ -181,6 +181,13 @@ router.route('/profile').get(function (req, res) {
         return res;
     });
 });
+router.route('/ratings').get(function (req, res) {
+    console.log("returning ratings");
+    Rate.find({username: req.query.username}, function (err, ratings) {
+        res.json({ratings: ratings});
+        return res;
+    });
+});
 router.route('/follow').post(function (req, res) {
     if (req.decoded.username === req.body.username) {
         res.status(401).json({message: 'Cant follow yourself'});
