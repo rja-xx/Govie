@@ -183,6 +183,29 @@ i.govie-new {
   padding-top: 18%;
 }
 
+.govie-wall {
+  padding-top: 18%;
+}
+
+.govie-wall-user {
+  background-image: url('../img/govie_logga.png');
+  background-size: 10%;
+  background-repeat: no-repeat ;
+  background-position: left;
+  background-position-x: 5%;
+  float: left;
+  height: 10%;
+  width: 100%;
+  text-align: left;
+  padding-left: 20%;
+  font-weight: bold;
+  font-family: "Helvetica Neue";
+}
+
+.goview-wall-item{
+  border-color: whitesmoke;
+}
+
 .govie-profile {
   float: right;
   height: 100%;

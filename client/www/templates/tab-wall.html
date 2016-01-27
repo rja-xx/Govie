@@ -1,11 +1,21 @@
-<ion-view view-title="Wall">
-    <ion-content class="padding">
-        <div class="list card">
-            <div class="item item-body">
-                <div>
-                    {{message}} - {{username}}
-                </div>
-            </div>
+<ion-view hide-nav-bar="true" view-title="Wall">
+  <div class="bar bar-header bar-light govie-standard-header">
+    <img src="../img/govie_hela_loggan_vit.png">
+  </div>
+    <ion-content class="govie-wall">
+      <div class="list">
+        <div ng-repeat="item in wall">
+          <button class="item govie-wall-user">{{item.username}}</button>
+          <div class="item item-thumbnail-left govie-wall-item" href="#">
+            <img src="../img/ionic.png">
+
+            <h2>{{item.movie}}</h2>
+            <rating class="govie-small-rating" ng-model="item.rate" max="5"></rating>
+            <p>{{item.note}}</p>
+
+            <p><b>Gick med:</b> <i ng-repeat="friend in item.friends">{{friend}}</i></p>
         </div>
+        </div>
+      </div>
     </ion-content>
 </ion-view>

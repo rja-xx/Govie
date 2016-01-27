@@ -14,6 +14,7 @@ var Config = require('./config');
 var uuid = require('uuid');
 var url = require('url');
 var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var _ = require('underscore');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
@@ -170,8 +171,24 @@ router.use(function (req, res, next) {
 
 router.route('/wall').get(function (req, res) {
     console.log("returning wall");
-    res.json({message: 'you got wall!', username: req.decoded.username});
-    return res;
+    var wall = [];
+    Profile.find({followers: req.decoded.username}).exec().
+        then(function (profiles) {
+            var promises = _.map(profiles, function (profile) {
+                return Rate.find({username: profile.username}).exec();
+            });
+            _.each(promises, function (promise) {
+                promise.then(function (rates) {
+                    _.forEach(rates, function (rate) {
+                        wall.push(rate);
+                    });
+                });
+            });
+            mongoose.Promise.all(promises).then(function () {
+                res.json({wall: wall});
+                return res;
+            });
+        });
 });
 
 router.route('/profile').get(function (req, res) {

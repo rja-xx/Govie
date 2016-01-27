@@ -7,8 +7,7 @@ angular.module('starter.controllers', ['ui.router'])
       if (token) {
         $http.get('http://213.67.22.6:8976/govie/wall').then(
           function (res) {
-            $scope.username = res.data.username;
-            $scope.message = res.data.message;
+            $scope.wall = res.data.wall;
           },
           function () {
             $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
