@@ -1,43 +1,26 @@
 angular.module('starter.controllers', ['ui.router'])
 
-  .controller('WallCtrl', function ($state, $scope, $http, $localStorage, $ionicModal) {
+  .controller('WallCtrl', function ($state, $scope, config, $http, $localStorage) {
     $scope.$on('$ionicView.enter', function (e) {
-      var token = $localStorage.get("govie-auth-token");
-      $http.defaults.headers.common['x-access-token'] = token;
-      if (token) {
-        $http.get('http://213.67.22.6:8976/govie/wall').then(
-          function (res) {
-            $scope.wall = res.data.wall;
-          },
-          function () {
-            $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
-              $scope.modal = modal;
-              modal.show();
-            });
-          });
-      } else {
-        $ionicModal.fromTemplateUrl('templates/choose.html').then(function (modal) {
-          $scope.modal = modal;
-          modal.show();
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/wall').then(
+        function (res) {
+          $scope.wall = res.data.wall;
         });
-        $scope.$on('modal.hidden', function () {
-          $state.go('tab.profile', {}, {reload: true});
-        });
-      }
     });
   })
 
-  .controller('ChooseCtrl', function ($scope, $ionicModal) {
+  .controller('ChooseCtrl', function ($scope, $ionicModal, $state) {
     $scope.openLogin = function () {
+      $scope.modal.hide();
       $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
-        $scope.modal.hide();
         $scope.modal = modal;
         modal.show();
       });
     };
     $scope.openCreateUser = function () {
+      $scope.modal.hide();
       $ionicModal.fromTemplateUrl('templates/createUser.html').then(function (modal) {
-        $scope.modal.hide();
         $scope.modal = modal;
         modal.show();
       });
@@ -50,22 +33,22 @@ angular.module('starter.controllers', ['ui.router'])
 
 
   .controller('TabCtrl', function ($ionicModal, $scope, $localStorage) {
-    $scope.modal = null;
-    $ionicModal.fromTemplateUrl('templates/splash.html', {}).then(function (modal) {
-        modal.show();
-        var token = $localStorage.get("govie-auth-token");
-        if (token == null) {
-          modal.hide();
-          $ionicModal.fromTemplateUrl('templates/choose.html', {}).then(function (modal) {
-            $scope.modal = modal;
-            modal.show();
-          });
-        }
-        else {
-          modal.hide();
-        }
-      }
-    );
+    //$scope.modal = null;
+    //$ionicModal.fromTemplateUrl('templates/splash.html', {}).then(function (modal) {
+    //    modal.show();
+    //    var token = $localStorage.get("govie-auth-token");
+    //    if (token == null) {
+    //      modal.hide();
+    //      $ionicModal.fromTemplateUrl('templates/choose.html', {}).then(function (modal) {
+    //        $scope.modal = modal;
+    //        modal.show();
+    //      });
+    //    }
+    //    else {
+    //      modal.hide();
+    //    }
+    //  }
+    //);
   })
 
   .controller('ChatDetailCtrl', function ($scope, $stateParams, Chats) {
@@ -76,7 +59,7 @@ angular.module('starter.controllers', ['ui.router'])
     console.log('got splash');
   })
 
-  .controller('CreateUserCtrl', function ($state, $scope, $http, $localStorage, _, owasp) {
+  .controller('CreateUserCtrl', function ($state, $scope, $http, $localStorage, _, owasp, config) {
     $scope.hasErrors = function () {
       var errors = $scope.errors;
       if (errors) {
@@ -110,10 +93,8 @@ angular.module('starter.controllers', ['ui.router'])
         username: username,
         password: password
       };
-      console.log(request);
-      $http.post('http://213.67.22.6:8976/addUser', request).then(function (res) {
+      $http.post(config.url + '/addUser', request).then(function (res) {
           $localStorage.set("govie-auth-token", res.data.token);
-          $http.defaults.headers.common['x-access-token'] = res.data.token;
           $scope.modal.hide();
           $state.go('tab.profile', {profile: ''}, {reload: true});
         },
@@ -127,17 +108,16 @@ angular.module('starter.controllers', ['ui.router'])
     }
   })
 
-  .controller('LoginCtrl', function ($state, $scope, $http, $localStorage) {
+  .controller('LoginCtrl', function ($state, $scope, $http, $localStorage, config) {
     $scope.wipeErrors = function () {
       $scope.errors = [];
     };
     $scope.login = function (username, password) {
       var request = {username: username, password: password};
-      $http.post('http://213.67.22.6:8976/authenticate', request).then(function (res) {
+      $http.post(config.url + '/authenticate', request).then(function (res) {
           $localStorage.set("govie-auth-token", res.data.token);
-          $http.defaults.headers.common['x-access-token'] = res.data.token;
           $scope.modal.hide();
-          $state.go('tab.wall', {}, {reload: true});
+          $state.go('tab.profile', {profile: ''}, {reload: true});
         },
         function () {
           $scope.errors = ['Login failed!'];
@@ -149,24 +129,24 @@ angular.module('starter.controllers', ['ui.router'])
       $localStorage.set("govie-auth-token", '');
     };
   })
-  .controller('SearchCtrl', function ($scope, $http, $localStorage, $state) {
+  .controller('SearchCtrl', function ($scope, $http, $localStorage, $state, config) {
     $scope.openProfile = function (profile) {
       $state.go('tab.profile', {profile: JSON.stringify(profile)}, {reload: true});
     };
     $scope.term = '';
     $scope.search = function (value) {
-      $http.get('http://213.67.22.6:8976/govie/search?term=' + value, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.get(config.url + '/govie/search?term=' + value, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $scope.hits = res.data.profiles;
       });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _) {
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $state) {
     $scope.following = false;
     $scope.follows = function () {
       return $scope.following;
     };
     $scope.follow = function (username) {
-      $http.post('http://213.67.22.6:8976/govie/follow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.post(config.url + '/govie/follow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $scope.following = true;
           $scope.profile.followers.push($scope.profile.name);
         },
@@ -175,7 +155,7 @@ angular.module('starter.controllers', ['ui.router'])
         });
     };
     $scope.unfollow = function (username) {
-      $http.post('http://213.67.22.6:8976/govie/unfollow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.post(config.url + '/govie/unfollow', {username: username}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
           $scope.following = false;
           $scope.profile.followers.pop();
         },
@@ -187,34 +167,55 @@ angular.module('starter.controllers', ['ui.router'])
 
 
     $scope.$on('$ionicView.enter', function (e) {
-      if ($stateParams.profile.length > 15) {
-        $scope.profile = JSON.parse($stateParams.profile);
-        $scope.following = _.contains(
-          _.map($scope.profile.followers, function (follower) {
-            return follower;
-          }), $localStorage.get("current-user"));
-      } else {
-        $http.get('http://213.67.22.6:8976/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-          $localStorage.set("current-user", res.data.profile.username);
-          $scope.ownProfile = res.data.profile;
-          $scope.profile = res.data.profile;
-          $scope.isOwnProfile = true;
+      var token = $localStorage.get("govie-auth-token");
+      if (!token) {
+        $ionicModal.fromTemplateUrl('templates/choose.html').then(function (modal) {
+          $scope.modal = modal;
+          modal.show();
         });
+      } else {
+        if ($stateParams.profile.length > 15) {
+          $scope.profile = JSON.parse($stateParams.profile);
+          $scope.following = _.contains(
+            _.map($scope.profile.followers, function (follower) {
+              return follower;
+            }), $localStorage.get("current-user"));
+          $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+            $scope.ratings = res.data.ratings;
+          }, function (err) {
+            $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
+              $scope.modal = modal;
+              modal.show();
+            });
+          });
+        } else {
+          $http.get(config.url + '/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+            $localStorage.set("current-user", res.data.profile.username);
+            $scope.ownProfile = res.data.profile;
+            $scope.profile = res.data.profile;
+            $scope.isOwnProfile = true;
+            $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+              $scope.ratings = res.data.ratings;
+            });
+          }, function (err) {
+            $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
+              $scope.modal = modal;
+              modal.show();
+            });
+          });
+        }
       }
-      $http.get('http://213.67.22.6:8976/govie/ratings?username='+$scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-        $scope.ratings = res.data.ratings;
-      });
     });
 
 
   })
 
-  .controller('RateCtrl', function ($scope, _, $http, $localStorage, $state) {
+  .controller('RateCtrl', function ($scope, config, _, $http, $localStorage, $state) {
     $scope.movie = {};
     $scope.person = {};
     $scope.request = {}
 
-    $scope.chooseMovie = function(title){
+    $scope.chooseMovie = function (title) {
       $scope.moviesHits = [];
       $scope.movie.title = title;
     };
@@ -231,17 +232,17 @@ angular.module('starter.controllers', ['ui.router'])
       $scope.friendHits = [];
     };
     $scope.searchFriend = function () {
-      $http.get('http://213.67.22.6:8976/govie/search?term=' + $scope.person.term, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.get(config.url + '/govie/search?term=' + $scope.person.term, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $scope.friendHits = res.data.profiles;
       });
     };
-    $scope.submitRating = function(){
+    $scope.submitRating = function () {
       var rateReq = {};
       rateReq.note = $scope.request.note;
       rateReq.movie = $scope.movie.title;
       rateReq.friends = [$scope.person.term];
       rateReq.rate = $scope.request.rate;
-      $http.post('http://213.67.22.6:8976/govie/rate', rateReq, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+      $http.post(config.url + '/govie/rate', rateReq, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $state.go('tab.profile', {}, {reload: true});
       });
     };

@@ -6,7 +6,8 @@ var RateSchema   = new Schema({
     movie: String,
     friends: [String],
     note: String,
-    rate: Number
+    rate: Number,
+    time : { type : Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Rate', RateSchema);

@@ -172,23 +172,26 @@ router.use(function (req, res, next) {
 router.route('/wall').get(function (req, res) {
     console.log("returning wall");
     var wall = [];
-    Profile.find({followers: req.decoded.username}).exec().
-        then(function (profiles) {
-            var promises = _.map(profiles, function (profile) {
-                return Rate.find({username: profile.username}).exec();
-            });
-            _.each(promises, function (promise) {
-                promise.then(function (rates) {
-                    _.forEach(rates, function (rate) {
-                        wall.push(rate);
-                    });
+    Profile.find({followers: req.decoded.username}).exec().then(function (profiles) {
+        var promises = _.map(profiles, function (profile) {
+            return Rate.find({username: profile.username}).exec();
+        });
+        _.each(promises, function (promise) {
+            promise.then(function (rates) {
+                _.forEach(rates, function (rate) {
+                    wall.push(rate);
                 });
             });
-            mongoose.Promise.all(promises).then(function () {
-                res.json({wall: wall});
-                return res;
-            });
         });
+        mongoose.Promise.all(promises).then(function () {
+            res.json({
+                wall: _.sortBy(wall, function (rate) {
+                    return rate.time;
+                })
+            });
+            return res;
+        });
+    });
 });
 
 router.route('/profile').get(function (req, res) {

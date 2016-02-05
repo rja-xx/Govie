@@ -4,8 +4,8 @@ angular.module('starter.services', ['ngResource'])
     return $window._;
   }])
 
-  .factory('mqtt', function ($rootScope) {
-    return mqtt;
+  .factory('config', function ($window) {
+    return govieconfig;
   })
 
   .factory('owasp', ['$window', function ($window) {
