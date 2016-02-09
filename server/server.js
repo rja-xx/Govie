@@ -173,6 +173,7 @@ router.route('/wall').get(function (req, res) {
     console.log("returning wall");
     var wall = [];
     Profile.find({followers: req.decoded.username}).exec().then(function (profiles) {
+        profiles.push({username: req.decoded.username})
         var promises = _.map(profiles, function (profile) {
             return Rate.find({username: profile.username}).exec();
         });
@@ -187,7 +188,7 @@ router.route('/wall').get(function (req, res) {
             res.json({
                 wall: _.sortBy(wall, function (rate) {
                     return rate.time;
-                })
+                }).reverse()
             });
             return res;
         });
