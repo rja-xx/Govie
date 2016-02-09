@@ -7,10 +7,10 @@
         <div ng-repeat="item in wall">
           <button class="item govie-wall-user">{{item.username}}</button>
           <div class="item item-thumbnail-left govie-wall-item" href="#">
-            <img src="../img/ionic.png">
+            <img src="{{item.posterUrl}}" class="govie-poster-image">
 
             <h2>{{item.movie}}</h2>
-            <rating class="govie-small-rating" ng-model="item.rate" max="5"></rating>
+            <rating readOnly="readOnly" class="govie-small-rating" ng-model="item.rate" max="5"></rating>
             <p>{{item.note}}</p>
 
             <p><b>Gick med:</b> <i ng-repeat="friend in item.friends">{{friend}}</i></p>

@@ -225,16 +225,14 @@ angular.module('starter.controllers', ['ui.router'])
     $scope.person = {};
     $scope.request = {}
 
-    $scope.chooseMovie = function (title) {
+    $scope.chooseMovie = function (movie) {
       $scope.moviesHits = [];
-      $scope.movie.title = title;
+      $scope.movie = movie;
     };
     $scope.searchMovie = function () {
-      $scope.moviesHits = _.filter([{title: 'Rambo'}, {title: 'Rocky'}, {title: 'Geronimo'}], function (title) {
-        if (title.title.toLowerCase().indexOf($scope.movie.title.toLowerCase()) != -1) {
-          return true;
-        }
-      })
+      $http.get(config.url + '/govie/findMovie?searchterm='+$scope.movie.title, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+          $scope.moviesHits = res.data.hits;
+        });
     };
 
     $scope.chooseFriend = function (username) {
@@ -250,6 +248,7 @@ angular.module('starter.controllers', ['ui.router'])
       var rateReq = {};
       rateReq.note = $scope.request.note;
       rateReq.movie = $scope.movie.title;
+      rateReq.posterUrl = $scope.movie.posterUrl;
       rateReq.friends = [$scope.person.term];
       rateReq.rate = $scope.request.rate;
       $http.post(config.url + '/govie/rate', rateReq, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {

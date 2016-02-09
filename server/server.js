@@ -10,6 +10,8 @@ var bodyParser = require('body-parser');
 var User = require('./model/user');
 var Rate = require('./model/rate');
 var Profile = require('./model/profile');
+var MovieSearch = require('./model/movie_search');
+var Movie = require('./model/movie');
 var Config = require('./config');
 var uuid = require('uuid');
 var url = require('url');
@@ -20,6 +22,8 @@ var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
 var owasp = require('owasp-password-strength-test');
+var feed = require("feed-read");
+var request = require('request');
 var mosca = require("mosca");
 var server = new mosca.Server({
     http: {
@@ -36,6 +40,59 @@ owasp.config({
     minOptionalTestsToPass: 2,
 });
 mongoose.connect(Config.database);
+
+var sfRssFeedReader = function (err, articles) {
+    if (err) throw err;
+    var filteredArticles = _.filter(articles, function (article) {
+        return article.title.indexOf('(VIP)') == -1 &&
+            article.title.indexOf('IMAX') == -1 &&
+            article.title.indexOf('ATMOS') == -1 &&
+            article.title.indexOf('(eng tal)') == -1 &&
+            article.title.indexOf('(sv tal)') == -1 &&
+            article.title.indexOf('Klassiker - ') == -1 &&
+            article.title.indexOf('(Barnvagnsbio)') == -1;
+    });
+    _.each(filteredArticles, function (sfMovie) {
+        MovieSearch.find({sfTitle: sfMovie.title}, function (err, res) {
+            if (err) {
+                console.log(err);
+            } else if (res.length === 0) {
+                request('http://api.themoviedb.org/3/search/movie?api_key=' + Config['tmdb-api-key'] + '&year=2016&query=' + encodeURIComponent(sfMovie.title), function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        var tmdbSearchResult = JSON.parse(body);
+                        if (tmdbSearchResult.results.length === 1) {
+                            request('http://api.themoviedb.org/3/movie/' + tmdbSearchResult.results[0].id + '?api_key=' + Config['tmdb-api-key'], function (error, response, body) {
+                                var tmdbMovie = JSON.parse(body);
+                                var movie = new Movie();
+                                movie.title = tmdbMovie.title;
+                                movie.tmdbId = tmdbMovie.id;
+                                movie.posterUrl = tmdbMovie.poster_path;
+                                movie.backdropUrl = tmdbMovie.backdrop_path;
+                                movie.popularity = tmdbMovie.popularity;
+                                movie.save();
+                                console.log("Lagret " + movie.title + " i databasen.");
+                            });
+                        }
+                        console.log(sfMovie.title + " Ga 0 eller fler enn ett treff");
+                        var movieSearch = new MovieSearch();
+                        movieSearch.sfTitle = sfMovie.title;
+                        movieSearch.result = tmdbSearchResult.results.length;
+                        movieSearch.save();
+                    }
+                });
+            }
+            console.log(sfMovie.title + " er allerede behandlet!");
+        });
+    });
+};
+
+console.log('Starting server at ' + new Date());
+var CronJob = require('cron').CronJob;
+new CronJob('* * * 20 0 0', function () {
+    console.log('Starting rss reader at ' + new Date());
+    feed("http://www.sf.se/sfmedia/external/rss/premieres.rss", sfRssFeedReader);
+    feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
+}, null, true, 'Europe/Oslo');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -197,8 +254,17 @@ router.route('/wall').get(function (req, res) {
 
 router.route('/tickets').get(function (req, res) {
     console.log("returning tickets");
-    Rate.find({friends: req.decoded.username}, null, {sort:{time: -1}}, function (err, ratings) {
+    Rate.find({friends: req.decoded.username}, null, {sort: {time: -1}}, function (err, ratings) {
         res.json({tickets: ratings});
+        return res;
+    });
+});
+
+router.route('/findMovie').get(function (req, res) {
+    var searchterm = req.query.searchterm;
+    console.log("finding movies for searchterm " + searchterm);
+    Movie.find({title: {'$regex': ".*" + searchterm + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
+        res.json({hits: hits});
         return res;
     });
 });
@@ -212,7 +278,7 @@ router.route('/profile').get(function (req, res) {
 });
 router.route('/ratings').get(function (req, res) {
     console.log("returning ratings");
-    Rate.find({username: req.query.username}, function (err, ratings) {
+    Rate.find({username: req.query.username}).sort({time: -1}).exec(function (err, ratings) {
         res.json({ratings: ratings});
         return res;
     });
@@ -302,6 +368,7 @@ router.route('/rate').post(function (req, res) {
     var rate = new Rate();
     rate.username = req.decoded.username;
     rate.movie = req.body.movie;
+    rate.posterUrl = 'http://image.tmdb.org/t/p/w300/' + req.body.posterUrl;
     rate.friends = req.body.friends;
     rate.note = req.body.note;
     rate.rate = req.body.rate;

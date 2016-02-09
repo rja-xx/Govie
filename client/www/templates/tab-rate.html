@@ -11,7 +11,7 @@
     </label>
     <ul ng-if="moviesHits.length > 0">
       <li ng-repeat="hit in moviesHits">
-        <button class="item" ng-click="chooseMovie(hit.title)">{{hit.title}}</button>
+        <button class="item" ng-click="chooseMovie(hit)">{{hit.title}}</button>
       </li>
     </ul>
     <label class="item item-input">
