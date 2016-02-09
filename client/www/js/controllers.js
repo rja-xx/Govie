@@ -124,10 +124,20 @@ angular.module('starter.controllers', ['ui.router'])
         });
     };
   })
-  .controller('AccountCtrl', function ($scope, $localStorage) {
+  .controller('AccountCtrl', function ($scope, $localStorage, $state) {
     $scope.logout = function () {
       $localStorage.set("govie-auth-token", '');
+      $state.go('tab.profile', {profile: ''}, {reload: true});
     };
+  })
+  .controller('TicketsCtrl', function ($state, $scope, config, $http, $localStorage) {
+    $scope.$on('$ionicView.enter', function (e) {
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/tickets').then(
+        function (res) {
+          $scope.tickets = res.data.tickets;
+        });
+    });
   })
   .controller('SearchCtrl', function ($scope, $http, $localStorage, $state, config) {
     $scope.openProfile = function (profile) {

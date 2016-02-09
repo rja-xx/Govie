@@ -187,6 +187,13 @@ i.govie-new {
   padding-top: 18%;
 }
 
+.govie-tickets {
+  padding-top: 18%;
+}
+.govie-tickets h1{
+  text-align: center;
+}
+
 .govie-wall-user {
   background-image: url('../img/govie_logga.png');
   background-size: 10%;
@@ -206,6 +213,22 @@ i.govie-new {
   border-color: whitesmoke;
 }
 
+.govie-tickets li {
+  text-align: left;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  list-style-position:inside;
+  border-bottom: 1px solid lightgray;
+}
+
+.govie-tickets li b{
+  margin-left: 5%;
+}
+.govie-tickets li img{
+  margin-left: 3%;
+  margin-top: -2%;
+}
+
 .govie-profile {
   float: right;
   height: 100%;
@@ -214,6 +237,11 @@ i.govie-new {
 
 .govie-profile-img {
   width: 20%;
+  float: left;
+}
+
+.govie-profile-img-small {
+  width: 10%;
   float: left;
 }
 
@@ -354,12 +382,6 @@ ul.rating li i {
 
 .bottomless-ruler {
   margin-bottom: 0px;
-}
-
-.govie-list-item{
-  border-bottom-color: #ddd;
-  border-width: 0px;
-  border-bottom-width: 1px;
 }
 
 .govie-gear {

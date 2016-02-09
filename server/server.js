@@ -195,6 +195,14 @@ router.route('/wall').get(function (req, res) {
     });
 });
 
+router.route('/tickets').get(function (req, res) {
+    console.log("returning tickets");
+    Rate.find({friends: req.decoded.username}, null, {sort:{time: -1}}, function (err, ratings) {
+        res.json({tickets: ratings});
+        return res;
+    });
+});
+
 router.route('/profile').get(function (req, res) {
     console.log("returning profile");
     Profile.find({username: req.decoded.username}, function (err, profile) {
