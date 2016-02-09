@@ -351,3 +351,19 @@ ul.rating li i {
   font-size: 20px;
   letter-spacing: -20px;
 }
+
+.bottomless-ruler {
+  margin-bottom: 0px;
+}
+
+.govie-list-item{
+  border-bottom-color: #ddd;
+  border-width: 0px;
+  border-bottom-width: 1px;
+}
+
+.govie-gear {
+    float: right;
+    margin-right: 5%;
+    margin-top: -5%;
+}

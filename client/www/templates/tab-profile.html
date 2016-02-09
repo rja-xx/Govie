@@ -11,6 +11,7 @@
         <span ng-if="!follows(profile.username) && !isOwnProfile" ng-click="follow(profile.username)" class="follow"></span>
         <span ng-if="follows(profile.username) && !isOwnProfile" ng-click="unfollow(profile.username)" class="follows"></span>
         <span class="username">{{profile.username}}</span>
+        <a class="ion-gear-a govie-gear" href="#/tab/account"></a>
         <ul>
           <li>{{profile.movies}}<br><span>Movies</span></li>
           <li>{{profile.follows.length}}<br><span>Follows</span></li>
@@ -18,9 +19,9 @@
         </ul>
       </div>
     </div>
-    <hr>
+    <hr class="bottomless-ruler">
     <div class="list">
-      <div class="item item-thumbnail-left" ng-repeat="rate in ratings" href="#">
+      <div class="item item-thumbnail-left govie-list-item" ng-repeat="rate in ratings" href="#">
         <img src="../img/ionic.png">
         <h2>{{rate.movie}}</h2>
         <rating class="govie-small-rating" ng-model="rate.rate" max="5"></rating>
