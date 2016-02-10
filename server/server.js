@@ -173,7 +173,7 @@ app.post('/authenticate', function (req, res) {
     console.log("Authenticate user: " + JSON.stringify(req.body))
     var password = req.body.password;
     User.find({username: req.body.username}, function (err, user) {
-        if (user[0].password === crypto.createHmac('sha1', user[0].salt).update(password).digest('hex')) {
+        if (user.length === 1 && user[0].password === crypto.createHmac('sha1', user[0].salt).update(password).digest('hex')) {
             var token = jwt.sign(user, app.get('superSecret'), {
                 expiresInMinutes: 1
             });
@@ -410,6 +410,34 @@ app.ws('/follow', function (ws, req) {
             ws.on('close', function () {
                 console.log("unsubscribe('follow/' " + req.decoded.username);
                 client.unsubscribe('follow/' + req.decoded.username);
+                wsClosed = true;
+            });
+        }
+    });
+});
+
+app.ws('/unfollow', function (ws, req) {
+    jwt.verify(req.query.token, app.get('superSecret'), function (err, decoded) {
+        if (err) {
+            return res.json({success: false, message: 'Failed to authenticate token.'});
+        } else {
+            var wsClosed = false;
+            if (Array.isArray(decoded)) {
+                req.decoded = decoded[0];
+            } else {
+                req.decoded = decoded;
+            }
+            client.subscribe('unfollow/' + req.decoded.username);
+            console.log("subscribe('unfollow/' " + req.decoded.username);
+            client.on('message', function (topic, msg) {
+                console.log("got mqtt topic" + topic + " msg " + msg);
+                if (topic == ('unfollow/' + req.decoded.username) && !wsClosed) {
+                    ws.send(msg);
+                }
+            });
+            ws.on('close', function () {
+                console.log("unsubscribe('unfollow/' " + req.decoded.username);
+                client.unsubscribe('unfollow/' + req.decoded.username);
                 wsClosed = true;
             });
         }
