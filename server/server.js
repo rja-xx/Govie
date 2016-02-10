@@ -24,14 +24,8 @@ var cors = require('cors');
 var owasp = require('owasp-password-strength-test');
 var feed = require("feed-read");
 var request = require('request');
-var mosca = require("mosca");
-var server = new mosca.Server({
-    http: {
-        port: 3000,
-        bundle: true,
-        static: './'
-    }
-});
+var mqtt = require('mqtt');
+var expressWs = require('express-ws')(app);
 owasp.config({
     allowPassphrases: true,
     maxLength: 128,
@@ -93,6 +87,8 @@ new CronJob('* * * 20 0 0', function () {
     feed("http://www.sf.se/sfmedia/external/rss/premieres.rss", sfRssFeedReader);
     feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
 }, null, true, 'Europe/Oslo');
+
+client = mqtt.createClient(1883, 'localhost');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -304,14 +300,9 @@ router.route('/follow').post(function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            var newPacket = {
-                                topic: req.body.username + '/follow',
-                                payload: {username: req.decoded.username}
-                            };
-                            server.publish(newPacket, function () {
-                                res.status(200).json({message: 'ok'});
-                                return res;
-                            });
+                            client.publish('follow/' + req.body.username, req.decoded.username);
+                            res.status(200).json({message: 'ok'});
+                            return res;
                         }
                     }
                 );
@@ -335,14 +326,9 @@ router.route('/unfollow').post(function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            var newPacket = {
-                                topic: req.body.username + '/unfollow',
-                                payload: {username: req.decoded.username}
-                            };
-                            server.publish(newPacket, function () {
-                                res.status(200).json({message: 'ok'});
-                                return res;
-                            });
+                            //client.publish('unfollow/' + req.body.username, req.decoded.username);
+                            res.status(200).json({message: 'ok'});
+                            return res;
                         }
                     }
                 );
@@ -401,6 +387,33 @@ router.get('/', function (req, res) {
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/govie', router);
+
+app.ws('/follow', function (ws, req) {
+    jwt.verify(req.query.token, app.get('superSecret'), function (err, decoded) {
+        if (err) {
+            return res.json({success: false, message: 'Failed to authenticate token.'});
+        } else {
+            if (Array.isArray(decoded)) {
+                req.decoded = decoded[0];
+            } else {
+                req.decoded = decoded;
+            }
+            client.subscribe('follow/' + req.decoded.username);
+            console.log("subscribe('follow/' " + req.decoded.username);
+            client.on('message', function (topic, msg) {
+                console.log("got mqtt topic" + topic + " msg " + msg);
+                if (topic == ('follow/' + req.decoded.username)) {
+                    ws.send(msg);
+                }
+            });
+            ws.on('close', function () {
+                console.log("unsubscribe('follow/' " + req.decoded.username);
+                client.unsubscribe('follow/' + req.decoded.username);
+            });
+        }
+    });
+});
+
 
 // START THE SERVER
 // =============================================================================

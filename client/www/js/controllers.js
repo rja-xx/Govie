@@ -151,6 +151,7 @@ angular.module('starter.controllers', ['ui.router'])
     };
   })
   .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $state) {
+
     $scope.following = false;
     $scope.follows = function () {
       return $scope.following;
@@ -174,7 +175,7 @@ angular.module('starter.controllers', ['ui.router'])
         });
     };
     $scope.isOwnProfile = false;
-
+    $scope.websocket = null;
 
     $scope.$on('$ionicView.enter', function (e) {
       var token = $localStorage.get("govie-auth-token");
@@ -204,8 +205,16 @@ angular.module('starter.controllers', ['ui.router'])
             $scope.ownProfile = res.data.profile;
             $scope.profile = res.data.profile;
             $scope.isOwnProfile = true;
-            $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+            $http.get(config.url + '/govie/ratings?token=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
               $scope.ratings = res.data.ratings;
+              $scope.websocket = new WebSocket(config.wsurl + '/follow?token=' + $localStorage.get("govie-auth-token"));
+              console.log('opened websocket');
+              $scope.websocket.onmessage = function (evt) {
+                console.log('got follower!');
+                $scope.$apply(function(){
+                  $scope.profile.followers.push("new follower");
+                });
+              };
             });
           }, function (err) {
             $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
@@ -217,6 +226,12 @@ angular.module('starter.controllers', ['ui.router'])
       }
     });
 
+    $scope.$on('$ionicView.leave', function (e) {
+      if ($scope.websocket) {
+        $scope.websocket.close();
+        console.log('closing websocket');
+      }
+    });
 
   })
 
@@ -230,9 +245,9 @@ angular.module('starter.controllers', ['ui.router'])
       $scope.movie = movie;
     };
     $scope.searchMovie = function () {
-      $http.get(config.url + '/govie/findMovie?searchterm='+$scope.movie.title, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-          $scope.moviesHits = res.data.hits;
-        });
+      $http.get(config.url + '/govie/findMovie?searchterm=' + $scope.movie.title, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $scope.moviesHits = res.data.hits;
+      });
     };
 
     $scope.chooseFriend = function (username) {
