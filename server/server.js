@@ -393,6 +393,7 @@ app.ws('/follow', function (ws, req) {
         if (err) {
             return res.json({success: false, message: 'Failed to authenticate token.'});
         } else {
+            var wsClosed = false;
             if (Array.isArray(decoded)) {
                 req.decoded = decoded[0];
             } else {
@@ -402,13 +403,14 @@ app.ws('/follow', function (ws, req) {
             console.log("subscribe('follow/' " + req.decoded.username);
             client.on('message', function (topic, msg) {
                 console.log("got mqtt topic" + topic + " msg " + msg);
-                if (topic == ('follow/' + req.decoded.username)) {
+                if (topic == ('follow/' + req.decoded.username) && !wsClosed) {
                     ws.send(msg);
                 }
             });
             ws.on('close', function () {
                 console.log("unsubscribe('follow/' " + req.decoded.username);
                 client.unsubscribe('follow/' + req.decoded.username);
+                wsClosed = true;
             });
         }
     });
