@@ -1,11 +1,14 @@
 angular.module('starter.controllers', ['ui.router'])
 
-  .controller('WallCtrl', function ($state, $scope, config, $http, $localStorage) {
+  .controller('WallCtrl', function ($state, $scope, config, $http, $localStorage, $moment) {
     $scope.$on('$ionicView.enter', function (e) {
       $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
       $http.get(config.url + '/govie/wall').then(
         function (res) {
           $scope.wall = res.data.wall;
+          _.each($scope.wall, function (e) {
+            e.relativeTime = $moment(e.time).fromNow();
+          });
         });
     });
   })
@@ -150,7 +153,7 @@ angular.module('starter.controllers', ['ui.router'])
       });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $state) {
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $moment) {
 
     $scope.following = false;
     $scope.follows = function () {
@@ -193,6 +196,9 @@ angular.module('starter.controllers', ['ui.router'])
             }), $localStorage.get("current-user"));
           $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
             $scope.ratings = res.data.ratings;
+            _.each($scope.ratings, function (e) {
+              e.relativeTime = $moment(e.time).fromNow();
+            });
           }, function (err) {
             $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
               $scope.modal = modal;
@@ -205,13 +211,16 @@ angular.module('starter.controllers', ['ui.router'])
             $scope.ownProfile = res.data.profile;
             $scope.profile = res.data.profile;
             $scope.isOwnProfile = true;
-            $http.get(config.url + '/govie/ratings?token=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+            $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
               $scope.ratings = res.data.ratings;
+              _.each($scope.ratings, function (e) {
+                e.relativeTime = $moment(e.time).fromNow();
+              });
               $scope.websocket = new WebSocket(config.wsurl + '/follow?token=' + $localStorage.get("govie-auth-token"));
               console.log('opened websocket');
               $scope.websocket.onmessage = function (evt) {
                 console.log('got follower!');
-                $scope.$apply(function(){
+                $scope.$apply(function () {
                   $scope.profile.followers.push("new follower");
                 });
               };

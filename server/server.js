@@ -400,7 +400,7 @@ app.ws('/follow', function (ws, req) {
                 req.decoded = decoded;
             }
             client.subscribe('follow/' + req.decoded.username);
-            console.log("subscribe('follow/' " + req.decoded.username);
+            console.log("subscribe('follow/'" + req.decoded.username);
             client.on('message', function (topic, msg) {
                 console.log("got mqtt topic" + topic + " msg " + msg);
                 if (topic == ('follow/' + req.decoded.username) && !wsClosed) {
@@ -408,7 +408,7 @@ app.ws('/follow', function (ws, req) {
                 }
             });
             ws.on('close', function () {
-                console.log("unsubscribe('follow/' " + req.decoded.username);
+                console.log("unsubscribe('follow/'" + req.decoded.username);
                 client.unsubscribe('follow/' + req.decoded.username);
                 wsClosed = true;
             });

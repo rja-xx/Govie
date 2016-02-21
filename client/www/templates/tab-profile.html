@@ -22,8 +22,10 @@
     <hr class="bottomless-ruler">
     <div class="list">
       <div class="item item-thumbnail-left govie-list-item" ng-repeat="rate in ratings" href="#">
-        <img src="{{rate.posterUrl}}" class="govie-poster-image"> 
-        <h2>{{rate.movie}}</h2>
+        <img src="{{rate.posterUrl}}" class="govie-poster-image">
+        <div>
+        <h2>{{rate.movie}} - </h2><h4>{{rate.relativeTime}}</h4>
+        </div>
         <rating class="govie-small-rating" ng-model="rate.rate" max="5"></rating>
         <p>{{rate.note}}</p>
         <p><b>Gick med:</b> <i ng-repeat="friend in rate.friends">{{friend}}</i> </p>

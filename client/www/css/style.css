@@ -209,6 +209,19 @@ i.govie-new {
   font-family: "Helvetica Neue";
 }
 
+.govie-profile-rating h2{
+  float: left;
+}
+.govie-profile-rating .govie-relative-time{
+  float: right;
+}
+
+.govie-wall-user span{
+  float: right;
+  font-weight: bold;
+  font-size: smaller;
+}
+
 .goview-wall-item{
   border-color: whitesmoke;
 }
@@ -378,6 +391,10 @@ ul.rating li i {
 .govie-small-rating {
   font-size: 20px;
   letter-spacing: -20px;
+}
+
+.govie-list-item div{
+  white-space: nowrap;
 }
 
 .bottomless-ruler {
