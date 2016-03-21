@@ -1,11 +1,11 @@
 <ion-view hide-nav-bar="true" view-title="Profile">
   <div class="bar bar-header bar-light govie-header">
-    <img src="../img/govie_logga_vit.png">
+    <img src="img/govie_logga_vit.png">
   </div>
   <ion-content class="govie-large-header">
     <div class="govie-profile">
       <div class="govie-profile-img">
-        <img src="../img/govie_logga.png">
+        <img src="{{profile.imgUrl}}">
       </div>
       <div class="govie-profile-info">
         <span ng-if="!follows(profile.username) && !isOwnProfile" ng-click="follow(profile.username)" class="follow"></span>

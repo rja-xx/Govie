@@ -5,7 +5,8 @@ var ProfileSchema   = new Schema({
     username: String,
     followers: [String],
     follows: [String],
-    movies: Number
+    movies: Number,
+    imgUrl: String
 });
 
 module.exports = mongoose.model('Profile', ProfileSchema);

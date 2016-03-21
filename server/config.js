@@ -8,7 +8,4 @@ module.exports = {
     //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=59.85766,17.6376&radius=100&types=movie_theater&key=AIzaSyBri-BATjtjQwT96yJ9HAerE6Kqy1Vmbxo&name=
     'google-places-api-key': 'AIzaSyBri-BATjtjQwT96yJ9HAerE6Kqy1Vmbxo',
 
-    'twitter-api-access-token': '3335599245-YzHCaQp7dmlUrgNPefnEFW0OcCFQMFhPJHxjKYy',
-    'twitter-secret-api-access-token': 'AwBmQ9jdNpDPWeE9cqnM2CfBxwEiqr0qENfdiCLFwT23D'
-
 };

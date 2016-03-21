@@ -61,6 +61,18 @@ a.govie-button {
   border-radius: 7%
 }
 
+i.twitter-login {
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 0%;
+  bottom: 15%;
+  background-image: url("../img/twitter-logo.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+
 i.govie-login {
   position: absolute;
   top: 15%;
@@ -194,12 +206,11 @@ i.govie-new {
   text-align: center;
 }
 
+.govie-tickets img{
+  border-radius: 50%;
+}
+
 .govie-wall-user {
-  background-image: url('../img/govie_logga.png');
-  background-size: 10%;
-  background-repeat: no-repeat ;
-  background-position: left;
-  background-position-x: 5%;
   float: left;
   height: 10%;
   width: 100%;
@@ -321,7 +332,8 @@ i.govie-new {
 
 .govie-profile-img img {
   width: 100%;
-  padding: 10% 10% 40% 10%;
+  padding: 10% 10% 10% 10%;
+  border-radius: 100%;
 }
 
 .govie-splash img {

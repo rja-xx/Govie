@@ -25,6 +25,7 @@ var owasp = require('owasp-password-strength-test');
 var feed = require("feed-read");
 var request = require('request');
 var mqtt = require('mqtt');
+var Twitter = require('twitter-node-client').Twitter;
 var expressWs = require('express-ws')(app);
 owasp.config({
     allowPassphrases: true,
@@ -34,6 +35,16 @@ owasp.config({
     minOptionalTestsToPass: 2,
 });
 mongoose.connect(Config.database);
+
+var twitterConfig = {
+    "consumerKey": "c70nU7fcLJk4Nu7KJFJZPSuIQ",
+    "consumerSecret": "POIFLLnvyTLZeXV5q3gawFpIMw1X1Wl3xfbz9oMMR0is4UAMJm",
+    "accessToken": "3335599245-YzHCaQp7dmlUrgNPefnEFW0OcCFQMFhPJHxjKYy",
+    "accessTokenSecret": "AwBmQ9jdNpDPWeE9cqnM2CfBxwEiqr0qENfdiCLFwT23D",
+    "callBackUrl": "http://tinyurl.com/krmpchb"
+};
+
+var twitter = new Twitter(twitterConfig);
 
 var sfRssFeedReader = function (err, articles) {
     if (err) throw err;
@@ -158,7 +169,7 @@ app.post('/addUser', function (req, res) {
                                 var token = jwt.sign(user, app.get('superSecret'), {
                                     expiresInMinutes: 1
                                 });
-                                res.status(200).json({token: token, profile: profile});
+                                res.status(200).json({token: token});
                                 return res;
                             }
                         });
@@ -184,6 +195,82 @@ app.post('/authenticate', function (req, res) {
             return res;
         }
     });
+});
+
+app.post('/twitterAuth', function (req, res) {
+    console.log("Authenticate user with twitter: " + JSON.stringify(req.body));
+
+    var userid = req.body.user_id,
+        twitterSecretToken = req.body.oauth_token_secret,
+        twitterToken = req.body.oauth_token;
+
+    User.find({twitterUserId: userid}, function (err, user) {
+        if (err) {
+            console.log("Error: " + JSON.stringify(err));
+            res.status(500).json({message: "Server error!", errors: [err]});
+            return res;
+        }
+        if (user.length === 1) {
+            console.log("Logging in with twitter");
+            User.update(
+                {twitterUserId: userid},
+                {$set: {twitterSecretToken: twitterSecretToken}},
+                {$set: {twitterToken: twitterToken}},
+                function (err, user) {
+                    var token = jwt.sign(user, app.get('superSecret'), {
+                        expiresInMinutes: 1
+                    });
+                    res.status(200).json({token: token});
+                    return res;
+                }
+            );
+        } else {
+            console.log("Creating user with twitter");
+            var user = new User();
+            user.alias = req.body.screen_name;
+            user.username = req.body.screen_name;
+            user.twitterUserId = userid;
+            user.twitterToken = twitterToken;
+            user.twitterSecretToken = twitterSecretToken;
+            user.salt = uuid.v4();
+            user.password = 'password1';
+            user.password = crypto.createHmac('sha1', user.salt).update(user.password).digest('hex');
+            user.save(function (err, updatedUser) {
+                    if (err) {
+                        res.status(500).json({message: "Server error!", errors: [err]});
+                        return res;
+                    } else {
+                        var profile = new Profile();
+                        profile.username = user.username;
+                        profile.followers = [];
+                        profile.following = [];
+                        profile.movies = 0;
+                        twitter.getUser({screen_name: user.username}, function (err) {
+                            res.status(500).json({message: "Server error!", errors: [err]});
+                            return res;
+                        }, function (result) {
+                            var response = JSON.parse(result);
+                            profile.imgUrl = response.profile_image_url;
+                            profile.alias = response.name;
+                            profile.save(function (err) {
+                                if (err) {
+                                    res.status(500).json({message: "Server error!", errors: [err]});
+                                    return res;
+                                }
+                                else {
+                                    var token = jwt.sign(user, app.get('superSecret'), {
+                                        expiresInMinutes: 1
+                                    });
+                                    res.status(200).json({token: token});
+                                    return res;
+                                }
+                            });
+                        });
+                    }
+                }
+            );
+        }
+    })
 });
 
 
@@ -358,22 +445,25 @@ router.route('/rate').post(function (req, res) {
     rate.friends = req.body.friends;
     rate.note = req.body.note;
     rate.rate = req.body.rate;
-    rate.save(function (err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("Saved rating of " + rate.movie);
-                Profile.update(
-                    {username: req.decoded.username},
-                    {$inc: {movies: 1}},
-                    {upsert: false},
-                    function (err) {
-                        res.status(200).json({"message": 'ok'});
-                        return res;
-                    });
+    Profile.find({username: rate.username}, function (err, profiles) {
+        rate.imgUrl = profiles[0].imgUrl;
+        rate.save(function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("Saved rating of " + rate.movie);
+                    Profile.update(
+                        {username: req.decoded.username},
+                        {$inc: {movies: 1}},
+                        {upsert: false},
+                        function (err) {
+                            res.status(200).json({"message": 'ok'});
+                            return res;
+                        });
+                }
             }
-        }
-    );
+        );
+    });
 });
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)

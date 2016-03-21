@@ -5,8 +5,12 @@
   <ion-content class="govie-tickets">
     <ul class="list">
       <li ng-repeat="item in tickets" class="govie-ticket-item">
-        <img src="../img/govie_logga.png" class="govie-profile-img-small">
-        <b>{{item.username}} har taggat dig i en biljett!</b>
+        <span>
+          <img src="{{item.imgUrl}}">
+        </span>
+        <span>
+          <b>{{item.username}} har taggat dig i en biljett!</b>
+        </span>
       </li>
     </ul>
   </ion-content>

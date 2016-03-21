@@ -13,7 +13,7 @@ angular.module('starter.controllers', ['ui.router'])
     });
   })
 
-  .controller('ChooseCtrl', function ($scope, $ionicModal, $state) {
+  .controller('ChooseCtrl', function ($scope, $ionicLoading, config, $localStorage, $cordovaOauth, $state, $ionicModal) {
     $scope.openLogin = function () {
       $scope.modal.hide();
       $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
@@ -28,6 +28,19 @@ angular.module('starter.controllers', ['ui.router'])
         modal.show();
       });
     };
+
+    $scope.twitterLogin = function () {
+      console.log('logging in with twitter');
+      var secret = 'POIFLLnvyTLZeXV5q3gawFpIMw1X1Wl3xfbz9oMMR0is4UAMJm';
+      var key = 'c70nU7fcLJk4Nu7KJFJZPSuIQ';
+      $cordovaOauth.twitter(key, secret).then(function (result) {
+        $localStorage.setObject('twitterLogin', result);
+        $scope.modal.hide();
+        $state.go('tab.profile', {profile: ''}, {reload: true});
+      }, function (error) {
+        console.log(JSON.stringify(error));
+      });
+    };
   })
 
   //.controller('ChatsCtrl', function ($localStorage) {
@@ -36,22 +49,6 @@ angular.module('starter.controllers', ['ui.router'])
 
 
   .controller('TabCtrl', function ($ionicModal, $scope, $localStorage) {
-    //$scope.modal = null;
-    //$ionicModal.fromTemplateUrl('templates/splash.html', {}).then(function (modal) {
-    //    modal.show();
-    //    var token = $localStorage.get("govie-auth-token");
-    //    if (token == null) {
-    //      modal.hide();
-    //      $ionicModal.fromTemplateUrl('templates/choose.html', {}).then(function (modal) {
-    //        $scope.modal = modal;
-    //        modal.show();
-    //      });
-    //    }
-    //    else {
-    //      modal.hide();
-    //    }
-    //  }
-    //);
   })
 
   .controller('ChatDetailCtrl', function ($scope, $stateParams, Chats) {
@@ -59,7 +56,6 @@ angular.module('starter.controllers', ['ui.router'])
   })
 
   .controller('SplashCtrl', function ($scope, $stateParams) {
-    console.log('got splash');
   })
 
   .controller('CreateUserCtrl', function ($state, $scope, $http, $localStorage, _, owasp, config) {
@@ -127,8 +123,10 @@ angular.module('starter.controllers', ['ui.router'])
         });
     };
   })
+
   .controller('AccountCtrl', function ($scope, $localStorage, $state) {
     $scope.logout = function () {
+      $localStorage.set("twitterLogin", '');
       $localStorage.set("govie-auth-token", '');
       $state.go('tab.profile', {profile: ''}, {reload: true});
     };
@@ -182,12 +180,8 @@ angular.module('starter.controllers', ['ui.router'])
 
     $scope.$on('$ionicView.enter', function (e) {
       var token = $localStorage.get("govie-auth-token");
-      if (!token) {
-        $ionicModal.fromTemplateUrl('templates/choose.html').then(function (modal) {
-          $scope.modal = modal;
-          modal.show();
-        });
-      } else {
+      if (token) {
+
         if ($stateParams.profile.length > 15) {
           $scope.profile = JSON.parse($stateParams.profile);
           $scope.following = _.contains(
@@ -232,8 +226,22 @@ angular.module('starter.controllers', ['ui.router'])
             });
           });
         }
+      } else {
+        var twitterLogin = $localStorage.get("twitterLogin");
+        if (twitterLogin) {
+          $http.post(config.url + '/twitterAuth', twitterLogin).then(function (res) {
+            $localStorage.set("govie-auth-token", res.data.token);
+            $state.go('tab.profile', {profile: ''}, {reload: true});
+          });
+        } else {
+          $ionicModal.fromTemplateUrl('templates/choose.html').then(function (modal) {
+            $scope.modal = modal;
+            modal.show();
+          });
+        }
       }
     });
+
 
     $scope.$on('$ionicView.leave', function (e) {
       if ($scope.websocket) {
@@ -241,7 +249,6 @@ angular.module('starter.controllers', ['ui.router'])
         console.log('closing websocket');
       }
     });
-
   })
 
   .controller('RateCtrl', function ($scope, config, _, $http, $localStorage, $state) {
