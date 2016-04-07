@@ -116,7 +116,7 @@ app.use(function (req, res, next) {
 });
 app.set('superSecret', Config.secret);
 
-var port = process.env.PORT || 8080;        // set our port
+var port = process.env.PORT || 8773;        // set our port
 
 // ROUTES FOR OUR API
 // =============================================================================
