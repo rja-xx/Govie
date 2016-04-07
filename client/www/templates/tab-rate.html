@@ -15,6 +15,15 @@
       </li>
     </ul>
     <label class="item item-input">
+      <input type="text" placeholder="Vilken biograf?" ng-model="theater.name" ng-change="searchTheater()">
+    </label>
+    <ul ng-if="theaterHits.length > 0">
+      <li ng-repeat="hit in theaterHits">
+        <button class="item" ng-click="chooseTheater(hit)">{{hit.name}}</button>
+      </li>
+    </ul>
+    <button ng-click="suggestTheater()" class="ion-android-globe"></button>
+    <label class="item item-input">
       <input type="text" placeholder="Tagga personer i din biljett" ng-model="person.term"
              ng-change="searchFriend()">
     </label>

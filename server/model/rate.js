@@ -6,6 +6,7 @@ var RateSchema   = new Schema({
     movie: String,
     posterUrl: String,
     imgUrl: String,
+    theater: String,
     friends: [String],
     note: String,
     rate: Number,

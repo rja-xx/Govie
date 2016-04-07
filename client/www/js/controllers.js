@@ -251,10 +251,11 @@ angular.module('starter.controllers', ['ui.router'])
     });
   })
 
-  .controller('RateCtrl', function ($scope, config, _, $http, $localStorage, $state) {
+  .controller('RateCtrl', function ($scope, config, _, $http, $localStorage, $state, $cordovaGeolocation) {
     $scope.movie = {};
     $scope.person = {};
-    $scope.request = {}
+    $scope.theater = {};
+    $scope.request = {};
 
     $scope.chooseMovie = function (movie) {
       $scope.moviesHits = [];
@@ -264,6 +265,33 @@ angular.module('starter.controllers', ['ui.router'])
       $http.get(config.url + '/govie/findMovie?searchterm=' + $scope.movie.title, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $scope.moviesHits = res.data.hits;
       });
+    };
+
+    $scope.suggestTheater = function () {
+      var posOptions = {timeout: 5000, enableHighAccuracy: false};
+      $cordovaGeolocation
+        .getCurrentPosition(posOptions)
+        .then(function (position) {
+          var lat = position.coords.latitude;
+          var long = position.coords.longitude;
+          $http.get(config.url + '/govie/suggestTheater?lat=' + lat + '&long=' + long, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+            $scope.theater = res.data;
+          });
+        }, function (err) {
+          console.log(err);
+        });
+    };
+
+    $scope.chooseTheater = function (theater) {
+      $scope.theaterHits = [];
+      $scope.theater = theater;
+    };
+
+    $scope.searchTheater = function () {
+      var theaters = [{name: 'Spegeln'}, {name: 'Royal'}, {name: 'Filmstaden'}, {name: 'Slottsbiografen'}];
+      $scope.theaterHits = _.filter(theaters, function (theater) {
+        return theater.name.indexOf($scope.theater.name) !== -1;
+      })
     };
 
     $scope.chooseFriend = function (username) {
@@ -279,6 +307,7 @@ angular.module('starter.controllers', ['ui.router'])
       var rateReq = {};
       rateReq.note = $scope.request.note;
       rateReq.movie = $scope.movie.title;
+      rateReq.theater = $scope.theater.name;
       rateReq.posterUrl = $scope.movie.posterUrl;
       rateReq.friends = [$scope.person.term];
       rateReq.rate = $scope.request.rate;

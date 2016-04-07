@@ -437,6 +437,23 @@ router.route('/search').get(function (req, res) {
         return res;
     });
 });
+router.route('/suggestTheater').get(function (req, res) {
+    var googleSuggestApiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+    urlWithLocation = googleSuggestApiUrl + '?location=' + req.query.lat + ',' + req.query.long
+    urlWithParams = urlWithLocation + '&radius=100&types=movie_theater&name='
+    locationUrl = urlWithParams + '&key='+Config['google-places-api-key'];
+    request(locationUrl, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var locationResult = JSON.parse(body);
+            if (locationResult.results.length > 0) {
+                res.status(200).json({'name': locationResult.results[0].name});
+            } else {
+                res.status(200).json({'name': '?'});
+            }
+            return res;
+        }
+    });
+});
 router.route('/rate').post(function (req, res) {
     var rate = new Rate();
     rate.username = req.decoded.username;
@@ -444,6 +461,7 @@ router.route('/rate').post(function (req, res) {
     rate.posterUrl = 'http://image.tmdb.org/t/p/w300/' + req.body.posterUrl;
     rate.friends = req.body.friends;
     rate.note = req.body.note;
+    rate.theater = req.body.theater;
     rate.rate = req.body.rate;
     Profile.find({username: rate.username}, function (err, profiles) {
         rate.imgUrl = profiles[0].imgUrl;
