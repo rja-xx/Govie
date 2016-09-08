@@ -1,0 +1,29 @@
+version: '2'
+services:
+  db:
+    container_name: goviecache
+    build: db/.
+    volumes:
+      - ./data:/data/goviedb
+    ports:
+      - 27017:27017
+
+  server:
+    container_name: govieserver
+    build: server/.
+    ports:
+      - 8773:8773
+    links:
+      - db
+      - events
+
+  events:
+    container_name: govieevents
+    build: events/.
+    ports:
+      - 1883:1883
+    links:
+      - db
+
+volumes:
+   goviecache:

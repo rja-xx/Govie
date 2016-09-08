@@ -99,7 +99,7 @@ new CronJob('* * * * 0 0', function () {
     feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
 }, null, true, 'Europe/Oslo');
 
-client = mqtt.createClient(1883, 'localhost');
+client = mqtt.createClient(1883, 'govieevents');
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
