@@ -275,7 +275,7 @@ angular.module('starter.controllers', ['ui.router'])
           var lat = position.coords.latitude;
           var long = position.coords.longitude;
           $http.get(config.url + '/govie/suggestTheater?lat=' + lat + '&long=' + long, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-            $scope.theater = res.data;
+            $scope.theaterHits = res.data;
           });
         }, function (err) {
           console.log(err);
@@ -288,10 +288,9 @@ angular.module('starter.controllers', ['ui.router'])
     };
 
     $scope.searchTheater = function () {
-      var theaters = [{name: 'Spegeln'}, {name: 'Royal'}, {name: 'Filmstaden'}, {name: 'Slottsbiografen'}];
-      $scope.theaterHits = _.filter(theaters, function (theater) {
-        return theater.name.indexOf($scope.theater.name) !== -1;
-      })
+      $http.get(config.url + '/govie/findTheater?searchterm=' + $scope.theater.name, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        $scope.theaterHits = res.data.hits;
+      });
     };
 
     $scope.chooseFriend = function (username) {

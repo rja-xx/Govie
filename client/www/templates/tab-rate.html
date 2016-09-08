@@ -19,7 +19,9 @@
     </label>
     <ul ng-if="theaterHits.length > 0">
       <li ng-repeat="hit in theaterHits">
-        <button class="item" ng-click="chooseTheater(hit)">{{hit.name}}</button>
+        <button class="item" ng-click="chooseTheater(hit)"><b>{{hit.name}}</b> <br>
+          <small>{{hit.address}}</small>
+        </button>
       </li>
     </ul>
     <button ng-click="suggestTheater()" class="ion-android-globe"></button>

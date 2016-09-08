@@ -9,6 +9,7 @@ var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 var User = require('./model/user');
 var Rate = require('./model/rate');
+var Theater = require('./model/theater');
 var Profile = require('./model/profile');
 var MovieSearch = require('./model/movie_search');
 var Movie = require('./model/movie');
@@ -93,7 +94,7 @@ var sfRssFeedReader = function (err, articles) {
 
 console.log('Starting server at ' + new Date());
 var CronJob = require('cron').CronJob;
-new CronJob('* * * * 0 0', function () {
+new CronJob('* * * * 11  0', function () {
     console.log('Starting rss reader at ' + new Date());
     feed("http://www.sf.se/sfmedia/external/rss/premieres.rss", sfRssFeedReader);
     feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
@@ -343,6 +344,15 @@ router.route('/tickets').get(function (req, res) {
     });
 });
 
+router.route('/findTheater').get(function (req, res) {
+    var searchterm = req.query.searchterm;
+    console.log("finding theaters for searchterm " + searchterm);
+    Theater.find({name: {'$regex': ".*" + searchterm + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
+        res.json({hits: hits});
+        return res;
+    });
+});
+
 router.route('/findMovie').get(function (req, res) {
     var searchterm = req.query.searchterm;
     console.log("finding movies for searchterm " + searchterm);
@@ -438,17 +448,39 @@ router.route('/search').get(function (req, res) {
     });
 });
 router.route('/suggestTheater').get(function (req, res) {
-    var googleSuggestApiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-    urlWithLocation = googleSuggestApiUrl + '?location=' + req.query.lat + ',' + req.query.long
-    urlWithParams = urlWithLocation + '&radius=100&types=movie_theater&name='
-    locationUrl = urlWithParams + '&key='+Config['google-places-api-key'];
+    var googleSuggestApiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+        urlWithLocation = googleSuggestApiUrl + '?location=' + req.query.lat + ',' + req.query.long,
+        urlWithParams = urlWithLocation + '&radius=100000&types=movie_theater&name=',
+        locationUrl = urlWithParams + '&key=' + Config['google-places-api-key'];
     request(locationUrl, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var locationResult = JSON.parse(body);
             if (locationResult.results.length > 0) {
-                res.status(200).json({'name': locationResult.results[0].name});
+                _.each(locationResult.results, function (result) {
+                    Theater.find({googleid: result.id}).limit(1).exec(function (err, hits) {
+                        if (hits.length === 0) {
+                            var theater = new Theater();
+                            theater.name = result.name;
+                            theater.lat = result.geometry.location.lat;
+                            theater.long = result.geometry.location.lng;
+                            theater.address = result.vicinity;
+                            theater.googleid = result.id;
+                            theater.save(function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+                                        console.log("Saved theater " + result);
+                                    }
+                                }
+                            );
+                        }
+                    });
+                });
+                res.status(200).json(_.map(locationResult.results, function (result) {
+                    return {'name': result.name, 'address': result.vicinity};
+                }));
             } else {
-                res.status(200).json({'name': '?'});
+                res.status(200).json([{'name': 'ingen forslag'}]);
             }
             return res;
         }
