@@ -122,6 +122,13 @@ var port = process.env.PORT || 8773;        // set our port
 // ROUTES FOR OUR API
 // =============================================================================
 
+app.post('/addMovies', function (req, res) {
+    feed("http://www.sf.se/sfmedia/external/rss/premieres.rss", sfRssFeedReader);
+    feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
+    res.status(200);
+    return res;
+});
+
 app.post('/addUser', function (req, res) {
     console.log("adding user: " + JSON.stringify(req.body));
     var errors = [];
