@@ -93,7 +93,7 @@ var sfRssFeedReader = function (err, articles) {
 
 console.log('Starting server at ' + new Date());
 var CronJob = require('cron').CronJob;
-new CronJob('* * * 20 0 0', function () {
+new CronJob('* * * * 0 0', function () {
     console.log('Starting rss reader at ' + new Date());
     feed("http://www.sf.se/sfmedia/external/rss/premieres.rss", sfRssFeedReader);
     feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
