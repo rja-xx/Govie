@@ -13,4 +13,5 @@ volumes/elasticsearch/data/*
 misc.xml
 *.iml
 modules.xml
-.idea
+.idea/
+.idea/*
