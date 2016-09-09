@@ -363,7 +363,7 @@ router.route('/findTheater').get(function (req, res) {
 router.route('/findMovie').get(function (req, res) {
     var searchterm = req.query.searchterm;
     console.log("finding movies for searchterm " + searchterm);
-    Movie.find({title: {'$regex': ".*" + searchterm + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
+    Movie.find({title: {'$regex': "ˆ.*" + searchterm + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
         res.json({hits: hits});
         return res;
     });
@@ -445,7 +445,7 @@ router.route('/search').get(function (req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
     console.log("searching profiles matching " + query.term);
-    Profile.find({"username": {'$regex': ".*" + query.term + ".*"}}, function (err, profiles) {
+    Profile.find({"username": {'$regex': "ˆ.*" + query.term + ".*"}}, function (err, profiles) {
         res.json({
             profiles: _.filter(profiles, function (profile) {
                 return profile.username !== req.decoded.username;
