@@ -10,3 +10,7 @@ node_modules/
 volumes/mongo/data/*
 volumes/cassandra/data/*
 volumes/elasticsearch/data/*
+misc.xml
+*.iml
+modules.xml
+.idea
