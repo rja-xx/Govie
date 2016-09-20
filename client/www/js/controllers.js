@@ -213,7 +213,7 @@ angular.module('starter.controllers', ['ui.router'])
               $scope.websocket = new WebSocket(config.wsurl + '/follow?token=' + $localStorage.get("govie-auth-token"));
               console.log('opened websocket');
               $scope.websocket.onmessage = function (evt) {
-                console.log('got follower!');
+                console.log(evt);
                 $scope.$apply(function () {
                   $scope.profile.followers.push("new follower");
                 });

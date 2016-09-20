@@ -42,7 +42,7 @@ var twitterConfig = {
     "consumerSecret": "POIFLLnvyTLZeXV5q3gawFpIMw1X1Wl3xfbz9oMMR0is4UAMJm",
     "accessToken": "3335599245-YzHCaQp7dmlUrgNPefnEFW0OcCFQMFhPJHxjKYy",
     "accessTokenSecret": "AwBmQ9jdNpDPWeE9cqnM2CfBxwEiqr0qENfdiCLFwT23D",
-    "callBackUrl": "http://tinyurl.com/krmpchb"
+    "callBackUrl": "http://tinyurl.com/hdmszav"
 };
 
 var twitter = new Twitter(twitterConfig);
@@ -551,7 +551,7 @@ app.ws('/follow', function (ws, req) {
             client.on('message', function (topic, msg) {
                 console.log("got mqtt topic" + topic + " msg " + msg);
                 if (topic == ('follow/' + req.decoded.username) && !wsClosed) {
-                    ws.send(msg);
+                    ws.send("follow");
                 }
             });
             ws.on('close', function () {
@@ -579,7 +579,7 @@ app.ws('/unfollow', function (ws, req) {
             client.on('message', function (topic, msg) {
                 console.log("got mqtt topic" + topic + " msg " + msg);
                 if (topic == ('unfollow/' + req.decoded.username) && !wsClosed) {
-                    ws.send(msg);
+                    ws.send('unfollow');
                 }
             });
             ws.on('close', function () {
