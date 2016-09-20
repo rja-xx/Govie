@@ -71,6 +71,9 @@ var sfRssFeedReader = function (err, articles) {
                                 var tmdbMovie = JSON.parse(body);
                                 var movie = new Movie();
                                 movie.title = tmdbMovie.title;
+                                if(tmdbMovie.title) {
+                                    movie.title_lowercase = tmdbMovie.title.toLowerCase();
+                                }
                                 movie.tmdbId = tmdbMovie.id;
                                 movie.posterUrl = tmdbMovie.poster_path;
                                 movie.backdropUrl = tmdbMovie.backdrop_path;
@@ -100,7 +103,7 @@ new CronJob('* * * * 11  0', function () {
     feed("http://www.sf.se/sfmedia/external/rss/topten.rss", sfRssFeedReader);
 }, null, true, 'Europe/Oslo');
 
-client = mqtt.createClient(1883, 'govieevents');
+client = mqtt.createClient(1883, Config.eventshost);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -165,6 +168,9 @@ app.post('/addUser', function (req, res) {
                     } else {
                         var profile = new Profile();
                         profile.username = user.username;
+                        profile.username_lowercase = user.username.toLowerCase();
+                        profile.alias = user.alias;
+                        profile.alias_lowercase = user.alias.toLowerCase();
                         profile.followers = [];
                         profile.following = [];
                         profile.movies = 0;
@@ -250,6 +256,7 @@ app.post('/twitterAuth', function (req, res) {
                     } else {
                         var profile = new Profile();
                         profile.username = user.username;
+                        profile.username_lowercase = user.username.toLowerCase();
                         profile.followers = [];
                         profile.following = [];
                         profile.movies = 0;
@@ -260,6 +267,7 @@ app.post('/twitterAuth', function (req, res) {
                             var response = JSON.parse(result);
                             profile.imgUrl = response.profile_image_url;
                             profile.alias = response.name;
+                            profile.alias_lowercase = user.alias.toLowerCase();
                             profile.save(function (err) {
                                 if (err) {
                                     res.status(500).json({message: "Server error!", errors: [err]});
@@ -354,7 +362,7 @@ router.route('/tickets').get(function (req, res) {
 router.route('/findTheater').get(function (req, res) {
     var searchterm = req.query.searchterm;
     console.log("finding theaters for searchterm " + searchterm);
-    Theater.find({name: {'$regex': ".*" + searchterm + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
+    Theater.find({name_lowercase: {'$regex': ".*" + searchterm.toLowerCase() + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
         res.json({hits: hits});
         return res;
     });
@@ -363,7 +371,7 @@ router.route('/findTheater').get(function (req, res) {
 router.route('/findMovie').get(function (req, res) {
     var searchterm = req.query.searchterm;
     console.log("finding movies for searchterm " + searchterm);
-    Movie.find({title: {'$regex': "ˆ.*" + searchterm + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
+    Movie.find({title_lowercase: {'$regex': ".*" + searchterm.toLowerCase() + ".*"}}, null, {sort: {popularity: 1}}).limit(10).exec(function (err, hits) {
         res.json({hits: hits});
         return res;
     });
@@ -445,7 +453,9 @@ router.route('/search').get(function (req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
     console.log("searching profiles matching " + query.term);
-    Profile.find({"username": {'$regex': "ˆ.*" + query.term + ".*"}}, function (err, profiles) {
+    Profile.find({
+        "username_lowercase": {'$regex': ".*" + query.term.toLowerCase() + ".*"}
+    }, function (err, profiles) {
         res.json({
             profiles: _.filter(profiles, function (profile) {
                 return profile.username !== req.decoded.username;
@@ -468,6 +478,7 @@ router.route('/suggestTheater').get(function (req, res) {
                         if (hits.length === 0) {
                             var theater = new Theater();
                             theater.name = result.name;
+                            theater.name_lowercase = result.name.toLowerCase();
                             theater.lat = result.geometry.location.lat;
                             theater.long = result.geometry.location.lng;
                             theater.address = result.vicinity;

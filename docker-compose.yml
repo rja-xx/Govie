@@ -1,13 +1,5 @@
 version: '2'
 services:
-  db:
-    container_name: goviecache
-    build: db/.
-    volumes:
-      - ./data/mongo:/data/goviedb
-    ports:
-      - 27017:27017
-
   server:
     container_name: govieserver
     build: server/.
@@ -24,30 +16,15 @@ services:
       - 1883:1883
     links:
       - db
-#
-  titandb:
-    container_name: govie_titan
-    image: elubow/titan-gremlin
-    links:
-      - elasticsearch
 
-
-
-  elasticsearch:
-    container_name: goviees
-    image: elasticsearch
+  db:
+    container_name: goviecache
+    build: db/.
+    volumes:
+      - ./data/mongo:/data/goviedb
     ports:
-      - 9200:9200
-
-  kibana:
-    container_name: goviekib
-    image: kibana
-    ports:
-      - 5601:5601
-    links:
-      - elasticsearch
-    environment:
-      - ELASTICSEARCH_URL=http://goviees:9200
+      - 27017:27017
 
 volumes:
    goviecache:
+"username_lowercase": {'$regex': ".*" + query.term.toLowerCase() + ".*"}1
