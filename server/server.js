@@ -391,6 +391,20 @@ router.route('/ratings').get(function (req, res) {
         return res;
     });
 });
+router.route('/followers').get(function (req, res) {
+    console.log("returning followers");
+    Profile.find({username: req.query.username}).exec(function (err, profile) {
+        res.json({followers: profile.followers});
+        return res;
+    });
+});
+router.route('/follows').get(function (req, res) {
+    console.log("returning follows");
+    Profile.find({username: req.query.username}).exec(function (err, profile) {
+        res.json({follows: profile.follows});
+        return res;
+    });
+});
 router.route('/follow').post(function (req, res) {
     if (req.decoded.username === req.body.username) {
         res.status(401).json({message: 'Cant follow yourself'});

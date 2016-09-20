@@ -140,6 +140,30 @@ angular.module('starter.controllers', ['ui.router'])
         });
     });
   })
+  .controller('FollowersCtrl', function ($state, $scope, config, $http, $localStorage) {
+    $scope.openProfile = function(username){
+      $state.go('tab.profile', {username: username}, {reload: true})
+    };
+    $scope.$on('$ionicView.enter', function (e) {
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/followers').then(
+        function (res) {
+          $scope.followers = res.data.followers;
+        });
+    });
+  })
+  .controller('FollowsCtrl', function ($state, $scope, config, $http, $localStorage) {
+    $scope.openProfile = function(username){
+      $state.go('tab.profile', {username: username}, {reload: true})
+    };
+    $scope.$on('$ionicView.enter', function (e) {
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/follows').then(
+        function (res) {
+          $scope.follows = res.data.followsf;
+        });
+    });
+  })
   .controller('SearchCtrl', function ($scope, $http, $localStorage, $state, config) {
     $scope.openProfile = function (profile) {
       $state.go('tab.profile', {profile: JSON.stringify(profile)}, {reload: true});
@@ -152,7 +176,12 @@ angular.module('starter.controllers', ['ui.router'])
     };
   })
   .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $moment) {
+    $scope.openFollowers = function(username){
 
+    };
+    $scope.openFollows = function(username){
+
+    };
     $scope.following = false;
     $scope.follows = function () {
       return $scope.following;

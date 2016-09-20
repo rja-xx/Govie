@@ -52,6 +52,24 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
           }
         }
       })
+      .state('tab.followers', {
+        url: '/followers',
+        views: {
+          'tab-profile': {
+            templateUrl: 'templates/tab-followers.html',
+            controller: 'FollowersCtrl'
+          }
+        }
+      })
+      .state('tab.follows', {
+        url: '/follows',
+        views: {
+          'tab-profile': {
+            templateUrl: 'templates/tab-follows.html',
+            controller: 'FollowsCtrl'
+          }
+        }
+      })
 
       .state('splash', {
         url: '/splash',

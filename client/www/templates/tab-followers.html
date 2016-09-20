@@ -1,0 +1,12 @@
+<ion-view hide-nav-bar="true" view-title="Followers">
+  <div class="bar bar-light govie-logo-header">
+    <img src="../img/govie_hela_loggan_vit.png">
+  </div>
+  <ion-content class="govie-followers-view">
+    <ul ng-if="followers.length > 0">
+      <li ng-repeat="follower in followers">
+        <button class="item" ng-click="openProfile(follower)">{{follower}}</button>
+      </li>
+    </ul>
+  </ion-content>
+</ion-view>
