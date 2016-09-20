@@ -438,7 +438,7 @@ router.route('/unfollow').post(function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            //client.publish('unfollow/' + req.body.username, req.decoded.username);
+                            client.publish('unfollow/' + req.body.username, req.decoded.username);
                             res.status(200).json({message: 'ok'});
                             return res;
                         }
@@ -559,15 +559,21 @@ app.ws('/follow', function (ws, req) {
             }
             client.subscribe('follow/' + req.decoded.username);
             console.log("subscribe('follow/'" + req.decoded.username);
+            client.subscribe('unfollow/' + req.decoded.username);
+            console.log("subscribe('unfollow/'" + req.decoded.username);
             client.on('message', function (topic, msg) {
                 console.log("got mqtt topic" + topic + " msg " + msg);
                 if (topic == ('follow/' + req.decoded.username) && !wsClosed) {
                     ws.send("follow");
+                } else if (topic == ('unfollow/' + req.decoded.username) && !wsClosed) {
+                    ws.send("unfollow");
                 }
             });
             ws.on('close', function () {
                 console.log("unsubscribe('follow/'" + req.decoded.username);
                 client.unsubscribe('follow/' + req.decoded.username);
+                console.log("unsubscribe('unfollow/'" + req.decoded.username);
+                client.unsubscribe('unfollow/' + req.decoded.username);
                 wsClosed = true;
             });
         }

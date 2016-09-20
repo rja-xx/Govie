@@ -27,4 +27,3 @@ services:
 
 volumes:
    goviecache:
-"username_lowercase": {'$regex': ".*" + query.term.toLowerCase() + ".*"}1

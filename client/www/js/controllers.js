@@ -214,9 +214,15 @@ angular.module('starter.controllers', ['ui.router'])
               console.log('opened websocket');
               $scope.websocket.onmessage = function (evt) {
                 console.log(evt);
-                $scope.$apply(function () {
-                  $scope.profile.followers.push("new follower");
-                });
+                if(evt.data == 'follow') {
+                  $scope.$apply(function () {
+                    $scope.profile.followers.push("new follower");
+                  });
+                }else{
+                  $scope.$apply(function () {
+                    $scope.profile.followers.pop();
+                  });
+                }
               };
             });
           }, function (err) {
