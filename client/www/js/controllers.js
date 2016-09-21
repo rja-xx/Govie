@@ -140,27 +140,28 @@ angular.module('starter.controllers', ['ui.router'])
         });
     });
   })
-  .controller('FollowersCtrl', function ($state, $scope, config, $http, $localStorage) {
+  .controller('FollowersCtrl', function ($state, $scope, config, $http, $localStorage, $stateParams) {
     $scope.openProfile = function(username){
+
       $state.go('tab.profile', {username: username}, {reload: true})
     };
     $scope.$on('$ionicView.enter', function (e) {
       $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
-      $http.get(config.url + '/govie/followers').then(
+      $http.get(config.url + '/govie/followers?username='+$scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
         function (res) {
           $scope.followers = res.data.followers;
         });
     });
   })
-  .controller('FollowsCtrl', function ($state, $scope, config, $http, $localStorage) {
+  .controller('FollowsCtrl', function ($state, $scope, config, $http, $localStorage, $stateParams) {
     $scope.openProfile = function(username){
       $state.go('tab.profile', {username: username}, {reload: true})
     };
     $scope.$on('$ionicView.enter', function (e) {
       $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
-      $http.get(config.url + '/govie/follows').then(
+      $http.get(config.url + '/govie/follows?username='+$scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
         function (res) {
-          $scope.follows = res.data.followsf;
+          $scope.follows = res.data.follows;
         });
     });
   })
@@ -175,12 +176,12 @@ angular.module('starter.controllers', ['ui.router'])
       });
     };
   })
-  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $moment) {
-    $scope.openFollowers = function(username){
-
+  .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $moment, $state) {
+    $scope.openFollowers = function(_){
+      $state.go('tab.followers', {username: $scope.profile.username}, {reload: true});
     };
-    $scope.openFollows = function(username){
-
+    $scope.openFollows = function(_){
+      $state.go('tab.follows', {username: $scope.profile.username}, {reload: true});
     };
     $scope.following = false;
     $scope.follows = function () {
@@ -210,9 +211,28 @@ angular.module('starter.controllers', ['ui.router'])
     $scope.$on('$ionicView.enter', function (e) {
       var token = $localStorage.get("govie-auth-token");
       if (token) {
-
-        if ($stateParams.profile.length > 15) {
-          $scope.profile = JSON.parse($stateParams.profile);
+        if($stateParams.username){
+          $http.get(config.url + '/govie/findprofile?username=' + $stateParams.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (profile) {
+            $scope.profile = profile;
+            $scope.following = _.contains(
+              _.map($scope.profile.followers, function (follower) {
+                return follower;
+              }), $localStorage.get("current-user"));
+            $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+              $scope.ratings = res.data.ratings;
+              _.each($scope.ratings, function (e) {
+                e.relativeTime = $moment(e.time).fromNow();
+              });
+            }, function (err) {
+              $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
+                $scope.modal = modal;
+                modal.show();
+              });
+            });
+          });
+        } else if ($stateParams.profile.length > 15) {
+          var profile = JSON.parse($stateParams.profile);
+            $scope.profile = profile;
           $scope.following = _.contains(
             _.map($scope.profile.followers, function (follower) {
               return follower;

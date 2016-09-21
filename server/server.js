@@ -478,6 +478,15 @@ router.route('/search').get(function (req, res) {
         return res;
     });
 });
+router.route('/findprofile').get(function (req, res) {
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
+    console.log("searching profiles matching " + query.username);
+    Profile.find({username: query.username}, function (err, profile) {
+        res.json({profile: profile[0]});
+        return res;
+    });
+});
 router.route('/suggestTheater').get(function (req, res) {
     var googleSuggestApiUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
         urlWithLocation = googleSuggestApiUrl + '?location=' + req.query.lat + ',' + req.query.long,

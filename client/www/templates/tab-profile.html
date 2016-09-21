@@ -14,8 +14,8 @@
         <a class="ion-gear-a govie-gear" ng-if="isOwnProfile" href="#/tab/account"></a>
         <ul>
           <li>{{profile.movies}}<br><span>Movies</span></li>
-          <li>{{profile.follows.length}}<br><span ng-click="openFollowers(profile.username)">Follows</span></li>
-          <li>{{profile.followers.length}}<br><span ng-click="openFollows(profile.username)">Followers</span></li>
+          <li>{{profile.follows.length}}<br><a ng-click="openFollows(profile.username)">Follows</a></li>
+          <li>{{profile.followers.length}}<br><a ng-click="openFollowers(profile.username)">Followers</a></li>
         </ul>
       </div>
     </div>
