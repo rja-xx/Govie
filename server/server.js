@@ -394,14 +394,14 @@ router.route('/ratings').get(function (req, res) {
 router.route('/followers').get(function (req, res) {
     console.log("returning followers");
     Profile.find({username: req.query.username}).exec(function (err, profile) {
-        res.json({followers: profile.followers});
+        res.json({followers: profile[0].followers});
         return res;
     });
 });
 router.route('/follows').get(function (req, res) {
     console.log("returning follows");
     Profile.find({username: req.query.username}).exec(function (err, profile) {
-        res.json({follows: profile.follows});
+        res.json({follows: profile[0].follows});
         return res;
     });
 });

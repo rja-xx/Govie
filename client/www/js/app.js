@@ -53,7 +53,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         }
       })
       .state('tab.followers', {
-        url: '/followers',
+        url: '/followers/:username',
         views: {
           'tab-profile': {
             templateUrl: 'templates/tab-followers.html',
@@ -62,7 +62,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         }
       })
       .state('tab.follows', {
-        url: '/follows',
+        url: '/follows/:username',
         views: {
           'tab-profile': {
             templateUrl: 'templates/tab-follows.html',

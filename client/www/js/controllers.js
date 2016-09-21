@@ -142,12 +142,16 @@ angular.module('starter.controllers', ['ui.router'])
   })
   .controller('FollowersCtrl', function ($state, $scope, config, $http, $localStorage, $stateParams) {
     $scope.openProfile = function(username){
-
-      $state.go('tab.profile', {username: username}, {reload: true})
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/findprofile?username='+username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+        function (res) {
+          $state.go('tab.profile', {profile: JSON.stringify(res.data.profile)}, {reload: true})
+        });
     };
+    $scope.username = $stateParams.username;
     $scope.$on('$ionicView.enter', function (e) {
       $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
-      $http.get(config.url + '/govie/followers?username='+$scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+      $http.get(config.url + '/govie/followers?username='+$stateParams.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
         function (res) {
           $scope.followers = res.data.followers;
         });
@@ -178,6 +182,7 @@ angular.module('starter.controllers', ['ui.router'])
   })
   .controller('ProfileCtrl', function ($scope, $http, $localStorage, $stateParams, _, config, $ionicModal, $moment, $state) {
     $scope.openFollowers = function(_){
+      console.log($scope.profile);
       $state.go('tab.followers', {username: $scope.profile.username}, {reload: true});
     };
     $scope.openFollows = function(_){
@@ -211,26 +216,7 @@ angular.module('starter.controllers', ['ui.router'])
     $scope.$on('$ionicView.enter', function (e) {
       var token = $localStorage.get("govie-auth-token");
       if (token) {
-        if($stateParams.username){
-          $http.get(config.url + '/govie/findprofile?username=' + $stateParams.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (profile) {
-            $scope.profile = profile;
-            $scope.following = _.contains(
-              _.map($scope.profile.followers, function (follower) {
-                return follower;
-              }), $localStorage.get("current-user"));
-            $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-              $scope.ratings = res.data.ratings;
-              _.each($scope.ratings, function (e) {
-                e.relativeTime = $moment(e.time).fromNow();
-              });
-            }, function (err) {
-              $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
-                $scope.modal = modal;
-                modal.show();
-              });
-            });
-          });
-        } else if ($stateParams.profile.length > 15) {
+        if ($stateParams.profile.length > 15) {
           var profile = JSON.parse($stateParams.profile);
             $scope.profile = profile;
           $scope.following = _.contains(
