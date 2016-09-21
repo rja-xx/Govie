@@ -302,6 +302,7 @@ i.govie-new {
 
 .govie-profile-info ul li a {
   font-weight: normal;
+  text-decoration: underline;
   font-family: "Helvetica Neue";
   font-size: 60% !important;
   color: #707070;

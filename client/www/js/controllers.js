@@ -159,11 +159,16 @@ angular.module('starter.controllers', ['ui.router'])
   })
   .controller('FollowsCtrl', function ($state, $scope, config, $http, $localStorage, $stateParams) {
     $scope.openProfile = function(username){
-      $state.go('tab.profile', {username: username}, {reload: true})
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/findprofile?username='+username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+        function (res) {
+          $state.go('tab.profile', {profile: JSON.stringify(res.data.profile)}, {reload: true})
+        });
     };
+    $scope.username = $stateParams.username;
     $scope.$on('$ionicView.enter', function (e) {
       $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
-      $http.get(config.url + '/govie/follows?username='+$scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+      $http.get(config.url + '/govie/follows?username='+$stateParams.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
         function (res) {
           $scope.follows = res.data.follows;
         });

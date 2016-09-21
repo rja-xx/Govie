@@ -132,6 +132,26 @@ app.post('/addMovies', function (req, res) {
     return res;
 });
 
+app.get('/addMovie', function (req, res) {
+    req.query.tmdbId
+    request('http://api.themoviedb.org/3/movie/' + req.query.tmdbId + '?api_key=' + Config['tmdb-api-key'], function (error, response, body) {
+        var tmdbMovie = JSON.parse(body);
+        var movie = new Movie();
+        movie.title = tmdbMovie.title;
+        if(tmdbMovie.title) {
+            movie.title_lowercase = tmdbMovie.title.toLowerCase();
+        }
+        movie.tmdbId = tmdbMovie.id;
+        movie.posterUrl = tmdbMovie.poster_path;
+        movie.backdropUrl = tmdbMovie.backdrop_path;
+        movie.popularity = tmdbMovie.popularity;
+        movie.save();
+        console.log("Lagret " + movie.title + " i databasen.");
+        res.status(200).json(movie);
+        return res;
+    });
+});
+
 app.post('/addUser', function (req, res) {
     console.log("adding user: " + JSON.stringify(req.body));
     var errors = [];
