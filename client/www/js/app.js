@@ -61,6 +61,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
           }
         }
       })
+      .state('tab.likers', {
+        url: '/likers/:rateId',
+        views: {
+          'tab-profile': {
+            templateUrl: 'templates/tab-likers.html',
+            controller: 'LikersCtrl'
+          }
+        }
+      })
       .state('tab.follows', {
         url: '/follows/:username',
         views: {

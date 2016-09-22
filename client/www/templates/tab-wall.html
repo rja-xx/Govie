@@ -2,22 +2,26 @@
   <div class="bar bar-header bar-light govie-standard-header">
     <img src="../img/govie_hela_loggan_vit.png">
   </div>
-    <ion-content class="govie-wall">
-      <div class="list">
-        <div ng-repeat="item in wall">
-          <button class="item govie-wall-user">
-            <img src="{{item.imgUrl}}">{{item.username}} <span>{{item.relativeTime}}</span></button>
-          <div class="item item-thumbnail-left govie-wall-item" href="#">
-            <img src="{{item.posterUrl}}" class="govie-poster-image">
+  <ion-content class="govie-wall">
+    <div class="list">
+      <div ng-repeat="item in wall">
+        <button class="item govie-wall-user" ng-click="openProfile(item.username)">
+          <img src="{{item.imgUrl}}">{{item.username}} <span>{{item.relativeTime}}</span></button>
+        <div class="item item-thumbnail-left govie-wall-item" href="#">
+          <img src="{{item.posterUrl}}" class="govie-poster-image">
 
-            <h2>{{item.movie}}</h2>
-            <rating readOnly="readOnly" class="govie-small-rating" ng-model="item.rate" max="5"></rating>
-            <p>{{item.note}}</p>
+          <h2>{{item.movie}}</h2>
+          <rating readOnly="readOnly" class="govie-small-rating" ng-model="item.rate" max="5"></rating>
+          <p>{{item.note}}</p>
 
-            <p><b>Gick med:</b> <i ng-repeat="friend in item.friends">{{friend}}</i></p>
-            <p><b>Bio:</b>{{item.theater}}</p>
-        </div>
+          <p><b>Gick med:</b> <i ng-repeat="friend in item.friends">{{friend}}</i></p>
+          <p><b>Bio:</b>{{item.theater}}</p>
+          <p>
+            <a ng-click="openLikers(item._id)">Likes: {{item.likes.length}}</a>
+            <a ng-click="like(item._id)" ng-show="showLike(item.username)">(Like!)</a>
+          </p>
         </div>
       </div>
-    </ion-content>
+    </div>
+  </ion-content>
 </ion-view>

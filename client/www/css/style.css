@@ -237,6 +237,10 @@ i.govie-new {
   border-color: whitesmoke;
 }
 
+.goview-wall-item a{
+  text-decoration: underline;
+}
+
 .govie-tickets li {
   text-align: left;
   padding-top: 5%;
@@ -430,8 +434,8 @@ ul.rating li i {
 }
 
 .govie-poster-image {
-  max-height: 100% !important;
+  max-height: 85% !important;
   margin-top: -3%;
-  margin-left: 0%;
+  margin-left: -2%;
   max-width: 25%;
 }

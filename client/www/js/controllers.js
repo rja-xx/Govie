@@ -1,6 +1,26 @@
 angular.module('starter.controllers', ['ui.router'])
 
   .controller('WallCtrl', function ($state, $scope, config, $http, $localStorage, $moment) {
+    $scope.openProfile = function(username){
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/findprofile?username='+username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+        function (res) {
+          $state.go('tab.profile', {profile: JSON.stringify(res.data.profile)}, {reload: true})
+        });
+    };
+    $scope.openLikers = function(rateId){
+      $state.go('tab.likers', {rateId: rateId}, {reload: true});
+    };
+    $scope.like = function(rateId){
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.post(config.url + '/govie/like', {rateId: rateId}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+        function () {
+          $state.go('tab.wall', {}, {reload: true});
+        });
+    };
+    $scope.showLike = function(username){
+        return username !== $localStorage.get("current-user");
+    };
     $scope.$on('$ionicView.enter', function (e) {
       $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
       $http.get(config.url + '/govie/wall').then(
@@ -174,6 +194,23 @@ angular.module('starter.controllers', ['ui.router'])
         });
     });
   })
+  .controller('LikersCtrl', function ($state, $scope, config, $http, $localStorage, $stateParams) {
+    $scope.openProfile = function(username){
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/findprofile?username='+username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+        function (res) {
+          $state.go('tab.profile', {profile: JSON.stringify(res.data.profile)}, {reload: true})
+        });
+    };
+    $scope.username = $stateParams.username;
+    $scope.$on('$ionicView.enter', function (e) {
+      $http.defaults.headers.common['x-access-token'] = $localStorage.get("govie-auth-token");
+      $http.get(config.url + '/govie/likers?rateId='+$stateParams.rateId, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+        function (res) {
+          $scope.likers = res.data.likers;
+        });
+    });
+  })
   .controller('SearchCtrl', function ($scope, $http, $localStorage, $state, config) {
     $scope.openProfile = function (profile) {
       $state.go('tab.profile', {profile: JSON.stringify(profile)}, {reload: true});
@@ -192,6 +229,9 @@ angular.module('starter.controllers', ['ui.router'])
     };
     $scope.openFollows = function(_){
       $state.go('tab.follows', {username: $scope.profile.username}, {reload: true});
+    };
+    $scope.openLikers = function(rateId){
+      $state.go('tab.likers', {rateId: rateId}, {reload: true});
     };
     $scope.following = false;
     $scope.follows = function () {

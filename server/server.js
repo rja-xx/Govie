@@ -71,7 +71,7 @@ var sfRssFeedReader = function (err, articles) {
                                 var tmdbMovie = JSON.parse(body);
                                 var movie = new Movie();
                                 movie.title = tmdbMovie.title;
-                                if(tmdbMovie.title) {
+                                if (tmdbMovie.title) {
                                     movie.title_lowercase = tmdbMovie.title.toLowerCase();
                                 }
                                 movie.tmdbId = tmdbMovie.id;
@@ -138,7 +138,7 @@ app.get('/addMovie', function (req, res) {
         var tmdbMovie = JSON.parse(body);
         var movie = new Movie();
         movie.title = tmdbMovie.title;
-        if(tmdbMovie.title) {
+        if (tmdbMovie.title) {
             movie.title_lowercase = tmdbMovie.title.toLowerCase();
         }
         movie.tmdbId = tmdbMovie.id;
@@ -250,7 +250,7 @@ app.post('/twitterAuth', function (req, res) {
                 {twitterUserId: userid},
                 {$set: {twitterSecretToken: twitterSecretToken}},
                 {$set: {twitterToken: twitterToken}},
-                function (err, user) {
+                function (err, _) {
                     var token = jwt.sign(user, app.get('superSecret'), {
                         expiresInMinutes: 1
                     });
@@ -425,6 +425,13 @@ router.route('/follows').get(function (req, res) {
         return res;
     });
 });
+router.route('/likers').get(function (req, res) {
+    console.log("returning likers");
+    Rate.find({_id: req.query.rateId}).exec(function (err, rate) {
+        res.json({likers: rate[0].likes});
+        return res;
+    });
+});
 router.route('/follow').post(function (req, res) {
     if (req.decoded.username === req.body.username) {
         res.status(401).json({message: 'Cant follow yourself'});
@@ -454,6 +461,29 @@ router.route('/follow').post(function (req, res) {
                 );
             }
         });
+});
+router.route('/like').post(function (req, res) {
+    Rate.findById(req.body.rateId).exec(function (err, rate) {
+        var username = req.decoded.username;
+        if (rate.likes.indexOf(username) === -1) {
+            Rate.update(
+                {_id: req.body.rateId},
+                {$push: {likes: req.decoded.username}},
+                {upsert: true},
+                function (err) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log(req.decoded.username + ' liked!');
+                        res.status(200).json({message: 'ok'});
+                        return res;
+                    }
+                });
+        } else {
+            res.status(200).json({message: 'ok'});
+            return res;
+        }
+    });
 });
 router.route('/unfollow').post(function (req, res) {
     Profile.update(
@@ -554,6 +584,7 @@ router.route('/rate').post(function (req, res) {
     rate.posterUrl = 'http://image.tmdb.org/t/p/w300/' + req.body.posterUrl;
     rate.friends = req.body.friends;
     rate.note = req.body.note;
+    rate.likes = [];
     rate.theater = req.body.theater;
     rate.rate = req.body.rate;
     Profile.find({username: rate.username}, function (err, profiles) {

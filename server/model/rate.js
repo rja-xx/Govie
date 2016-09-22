@@ -8,6 +8,7 @@ var RateSchema   = new Schema({
     imgUrl: String,
     theater: String,
     friends: [String],
+    likes: [String],
     note: String,
     rate: Number,
     time : { type : Date, default: Date.now }
