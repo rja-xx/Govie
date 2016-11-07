@@ -14,9 +14,10 @@
         <button class="item" ng-click="chooseMovie(hit)">{{hit.title}}</button>
       </li>
     </ul>
-    <label class="item item-input">
+    <div class="item item-input">
       <input type="text" placeholder="Vilken biograf?" ng-model="theater.name" ng-change="searchTheater()">
-    </label>
+      <a ng-click="suggestTheater()" class="chosenfriends">?</a>
+    </div>
     <ul ng-if="theaterHits.length > 0">
       <li ng-repeat="hit in theaterHits">
         <button class="item" ng-click="chooseTheater(hit)"><b>{{hit.name}}</b> <br>
@@ -24,14 +25,16 @@
         </button>
       </li>
     </ul>
-    <button ng-click="suggestTheater()" class="ion-android-globe"></button>
     <label class="item item-input">
       <input type="text" placeholder="Tagga personer i din biljett" ng-model="person.term"
              ng-change="searchFriend()">
+      <span class="chosenfriends" id="chosenFriends">{{chosenFriends.length}}</span>
     </label>
     <ul ng-if="friendHits.length > 0">
       <li ng-repeat="hit in friendHits">
-        <button class="item" ng-click="chooseFriend(hit.username)">{{hit.username}}</button>
+        <button class="item" id='friend_{{hit.username}}' ng-click="chooseFriend(hit.username)">
+          {{hit.username}}
+        </button>
       </li>
     </ul>
     <label class="item item-input">
@@ -40,7 +43,7 @@
     <br>
     <rating ng-model="request.rate" max="5"></rating>
     <br>
-    <span>Ge betyg nu eller sen</span>
+    <!--<span>Ge betyg nu eller sen</span>-->
     <br>
     <a class="item govie-round-button" ng-click="submitRating()">Govie</a>
   </ion-content>

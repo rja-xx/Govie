@@ -342,6 +342,7 @@ angular.module('starter.controllers', ['ui.router'])
     $scope.person = {};
     $scope.theater = {};
     $scope.request = {};
+    $scope.chosenFriends = [];
 
     $scope.chooseMovie = function (movie) {
       $scope.moviesHits = [];
@@ -354,6 +355,7 @@ angular.module('starter.controllers', ['ui.router'])
     };
 
     $scope.suggestTheater = function () {
+      console.log("searching");
       var posOptions = {timeout: 5000, enableHighAccuracy: false};
       $cordovaGeolocation
         .getCurrentPosition(posOptions)
@@ -380,10 +382,13 @@ angular.module('starter.controllers', ['ui.router'])
     };
 
     $scope.chooseFriend = function (username) {
-      $scope.person.term = username;
+      $scope.chosenFriends.push(username);
+      $scope.person.term = '';
       $scope.friendHits = [];
+      angular.element(document.getElementById('chosenFriends')).addClass('friendChosen');
     };
     $scope.searchFriend = function () {
+      angular.element(document.getElementById('chosenFriends')).removeClass('friendChosen');
       $http.get(config.url + '/govie/search?term=' + $scope.person.term, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $scope.friendHits = res.data.profiles;
       });
@@ -394,7 +399,7 @@ angular.module('starter.controllers', ['ui.router'])
       rateReq.movie = $scope.movie.title;
       rateReq.theater = $scope.theater.name;
       rateReq.posterUrl = $scope.movie.posterUrl;
-      rateReq.friends = [$scope.person.term];
+      rateReq.friends = $scope.chosenFriends;
       rateReq.rate = $scope.request.rate;
       $http.post(config.url + '/govie/rate', rateReq, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
         $state.go('tab.profile', {}, {reload: true});
