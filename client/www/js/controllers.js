@@ -28,6 +28,7 @@ angular.module('starter.controllers', ['ui.router'])
           $scope.wall = res.data.wall;
           _.each($scope.wall, function (e) {
             e.relativeTime = $moment(e.time).fromNow();
+            e.friendsString = e.friends.join(', ').substring(0, 25);
           });
         });
     });
@@ -272,6 +273,7 @@ angular.module('starter.controllers', ['ui.router'])
             $scope.ratings = res.data.ratings;
             _.each($scope.ratings, function (e) {
               e.relativeTime = $moment(e.time).fromNow();
+              e.friendsstring = e.friends.join(', ');
             });
           }, function (err) {
             $ionicModal.fromTemplateUrl('templates/login.html').then(function (modal) {
@@ -289,12 +291,13 @@ angular.module('starter.controllers', ['ui.router'])
               $scope.ratings = res.data.ratings;
               _.each($scope.ratings, function (e) {
                 e.relativeTime = $moment(e.time).fromNow();
+                e.friendsstring = e.friends.join(', ');
               });
               $scope.websocket = new WebSocket(config.wsurl + '/follow?token=' + $localStorage.get("govie-auth-token"));
               console.log('opened websocket');
               $scope.websocket.onmessage = function (evt) {
                 console.log(evt);
-                if(evt.data == 'follow') {
+                if(evt.data === 'follow') {
                   $scope.$apply(function () {
                     $scope.profile.followers.push("new follower");
                   });
@@ -338,11 +341,15 @@ angular.module('starter.controllers', ['ui.router'])
   })
 
   .controller('RateCtrl', function ($scope, config, _, $http, $localStorage, $state, $cordovaGeolocation) {
-    $scope.movie = {};
-    $scope.person = {};
-    $scope.theater = {};
-    $scope.request = {};
-    $scope.chosenFriends = [];
+    $scope.$on('$ionicView.enter', function (e) {
+      $scope.movie = {};
+      $scope.person = {};
+      $scope.theater = {};
+      $scope.request = {};
+      $scope.placeholder = 'Tagga personer i din biljett';
+      $scope.chosenFriends = [];
+    });
+
 
     $scope.chooseMovie = function (movie) {
       $scope.moviesHits = [];
@@ -356,6 +363,7 @@ angular.module('starter.controllers', ['ui.router'])
 
     $scope.suggestTheater = function () {
       console.log("searching");
+      angular.element(document.getElementById('findTheater')).addClass('suggesting');
       var posOptions = {timeout: 5000, enableHighAccuracy: false};
       $cordovaGeolocation
         .getCurrentPosition(posOptions)
@@ -364,8 +372,12 @@ angular.module('starter.controllers', ['ui.router'])
           var long = position.coords.longitude;
           $http.get(config.url + '/govie/suggestTheater?lat=' + lat + '&long=' + long, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
             $scope.theaterHits = res.data;
+            angular.element(document.getElementById('findTheater')).removeClass('suggesting');
+            angular.element(document.getElementById('findTheater')).addClass('ion-happy-outline');
           });
         }, function (err) {
+          angular.element(document.getElementById('findTheater')).removeClass('suggesting');
+          angular.element(document.getElementById('findTheater')).addClass('ion-sad-outline');
           console.log(err);
         });
     };
@@ -385,12 +397,19 @@ angular.module('starter.controllers', ['ui.router'])
       $scope.chosenFriends.push(username);
       $scope.person.term = '';
       $scope.friendHits = [];
+      if ($scope.chosenFriends.length === 0) {
+        $scope.placeholder = 'Tagga personer i din biljett';
+      }else{
+        $scope.placeholder = $scope.chosenFriends.join(', ').substring(0, 40);
+      }
       angular.element(document.getElementById('chosenFriends')).addClass('friendChosen');
     };
     $scope.searchFriend = function () {
       angular.element(document.getElementById('chosenFriends')).removeClass('friendChosen');
       $http.get(config.url + '/govie/search?term=' + $scope.person.term, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
-        $scope.friendHits = res.data.profiles;
+        $scope.friendHits = _.filter(res.data.profiles, function(profile){
+          return $scope.chosenFriends.indexOf(profile.username)===-1;
+        });
       });
     };
     $scope.submitRating = function () {

@@ -28,7 +28,7 @@
         </div>
         <rating class="govie-small-rating" ng-model="rate.rate" max="5"></rating>
         <p>{{rate.note}}</p>
-        <p><b>Gick med:</b> <i ng-repeat="friend in rate.friends">{{friend}}</i> </p>
+        <p><b>Gick med:</b> <i>{{rate.friendsstring}}</i> </p>
         <p><b>Bio: </b>{{rate.theater}}</p>
         <p><a ng-click="openLikers(rate._id)">Likes: </a>{{rate.likes.length}}</p>
       </div>
