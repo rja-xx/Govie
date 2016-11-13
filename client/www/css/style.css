@@ -143,6 +143,20 @@ i.govie-new {
   height: 15%;
 }
 
+.poster-header {
+  width: 600%;
+  height: 15%;
+  margin-left: -220%;
+  transform: translate(-5%, -5%);;
+  overflow: hidden;
+}
+.poster-header img{
+  object-fit: contain;
+  height: 240%;
+  width: 100%;
+  margin-top: -2%;
+}
+
 .govie-normal-header {
   background-color: #fc3159 !important;
 }
@@ -412,6 +426,11 @@ ul.rating li i {
   text-align: left;
 }
 
+.govie-account li button {
+  width: 100%;
+  text-align: left;
+}
+
 .govie-rate .chosenfriends {
   border-radius: 50%;
   background-color: #fc3159;
@@ -434,6 +453,14 @@ ul.rating li i {
 
 .suggesting{
   animation: twirl 2000ms 0s linear infinite
+}
+
+.govie-account h3{
+  margin-left: 5%;
+  margin-top: 5%;
+  color: #767676;
+  font-weight: bold;
+  font-family: "Helvetica Neue";
 }
 
 @keyframes twirl {

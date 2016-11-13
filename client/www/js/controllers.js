@@ -145,12 +145,56 @@ angular.module('starter.controllers', ['ui.router'])
     };
   })
 
-  .controller('AccountCtrl', function ($scope, $localStorage, $state) {
+  .controller('AccountCtrl', function ($scope, $localStorage, $state, $http, config) {
+    $scope.settings = {};
+    $scope.settings.favoriteMovie = '';
+    $scope.oldFavorite = '';
+    $scope.moviesHits = [];
+    $scope.lastSearch = new Date();
+    $scope.findFavoriteMovie = function (term) {
+      var t = new Date();
+      t.setSeconds(t.getSeconds() - 3);
+      if ($scope.lastSearch < t && term.length > 1) {
+        $scope.lastSearch = new Date();
+        $http.get(config.url + '/govie/findFavoriteMovie?term=' + term, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(
+          function (res) {
+            var genres = res.data.genres;
+            var hits = res.data.movies.results;
+            hits = _.filter(hits, function (hit) {
+              return !hit.adult;
+            });
+            hits = _.map(hits, function (hit) {
+              var foundGenres = _.filter(genres, function(genre){
+                return hit.genre_ids.indexOf(genre.id) !== -1;
+              });
+              var text = _.map(foundGenres, function(g){
+                return g.name;
+              });
+              return _.extend(hit, {genre_text: text.join(', ')})
+            });
+            $scope.moviesHits = hits;
+          });
+      }
+    };
+    $scope.chooseFavorite = function (movie) {
+      $scope.settings.favoriteMovie = "";
+      $scope.moviesHits = [];
+      $http.post(config.url + '/govie/selectFavoriteMovie', {tmdbId: movie.id}, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+          $state.go('tab.profile', {profile: ''}, {reload: true});
+        });
+    };
     $scope.logout = function () {
       $localStorage.set("twitterLogin", '');
       $localStorage.set("govie-auth-token", '');
       $state.go('tab.profile', {profile: ''}, {reload: true});
     };
+    $scope.$on('$ionicView.enter', function (e) {
+      $scope.settings.favoriteMovie = "";
+      $http.get(config.url + '/govie/profile', {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
+        debugger;
+        $scope.oldFavorite = res.data.profile.favoriteMovie;
+      });
+    });
   })
   .controller('TicketsCtrl', function ($state, $scope, config, $http, $localStorage) {
     $scope.$on('$ionicView.enter', function (e) {
@@ -286,6 +330,11 @@ angular.module('starter.controllers', ['ui.router'])
             $localStorage.set("current-user", res.data.profile.username);
             $scope.ownProfile = res.data.profile;
             $scope.profile = res.data.profile;
+            if ($scope.profile.headerImageUrl && $scope.profile.headerImageUrl.indexOf('govie_logga') == -1) {
+              $scope.profile.headerImageUrl = 'http://image.tmdb.org/t/p/w500/' + $scope.profile.headerImageUrl;
+              angular.element(document.getElementById('profile-header')).addClass('poster-header');
+              angular.element(document.getElementById('profile-header')).removeClass('govie-header');
+            }
             $scope.isOwnProfile = true;
             $http.get(config.url + '/govie/ratings?username=' + $scope.profile.username, {headers: {'x-access-token': $localStorage.get("govie-auth-token")}}).then(function (res) {
               $scope.ratings = res.data.ratings;

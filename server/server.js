@@ -95,6 +95,7 @@ var sfRssFeedReader = function (err, articles) {
     });
 };
 
+var commondata = {};
 console.log('Starting server at ' + new Date());
 var CronJob = require('cron').CronJob;
 new CronJob('* * * * 11  0', function () {
@@ -104,6 +105,13 @@ new CronJob('* * * * 11  0', function () {
 }, null, true, 'Europe/Oslo');
 
 client = mqtt.createClient(1883, Config.eventshost);
+
+request('http://api.themoviedb.org/3/genre/movie/list?api_key=' + Config['tmdb-api-key'] + '&language=sv_SE', function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        commondata.genres = JSON.parse(body).genres;
+    }
+});
+
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -194,6 +202,8 @@ app.post('/addUser', function (req, res) {
                         profile.followers = [];
                         profile.following = [];
                         profile.movies = 0;
+                        profile.headerImageUrl = 'img/govie_logga_vit.png';
+                        profile.favoriteMovie = 'All time favoritfilm?';
                         profile.save(function (err) {
                             if (err) {
                                 res.status(500).json({message: "Server error!", errors: [err]});
@@ -343,6 +353,35 @@ router.use(function (req, res, next) {
         });
 
     }
+});
+
+router.route('/findFavoriteMovie').get(function (req, res) {
+    console.log("finding favorite by " + req.query.term);
+    request('http://api.themoviedb.org/3/search/movie?api_key=' + Config['tmdb-api-key'] + '&query=' + encodeURIComponent(req.query.term), function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var tmdbSearchResult = JSON.parse(body);
+            res.json({movies: tmdbSearchResult, genres: commondata.genres});
+            return res;
+        }
+    });
+});
+
+router.route('/selectFavoriteMovie').post(function (req, res) {
+    console.log("selecting favorite" + req.body.tmdbId);
+    var tmdbId = req.body.tmdbId;
+    request('http://api.themoviedb.org/3/movie/' + tmdbId + '?api_key=' + Config['tmdb-api-key'], function (error, response, body) {
+        var tmdbMovie = JSON.parse(body);
+        console.log("selecting favorite " + tmdbMovie.title);
+        Profile.update(
+            {username: req.decoded.username},
+            {$set: {favoriteMovie: tmdbMovie.title, headerImageUrl: tmdbMovie.backdrop_path}},
+            function (err, _) {
+                console.log("persisted favorite" + tmdbId+' for '+req.decoded.username);
+                res.status(200).json({message: 'ok'});
+                return res;
+            }
+        );
+    });
 });
 
 router.route('/wall').get(function (req, res) {

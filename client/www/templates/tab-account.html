@@ -1,6 +1,18 @@
 <ion-view view-title="Account" ng-controller="AccountCtrl">
-  <ion-content>
-    <a class="item govie-round-button"
-       ng-click="logout()">Logg ut</a>
+  <ion-content class="govie-account">
+    <h3>Favorittfilm:</h3>
+    <label class="item item-input">
+      <input type="text" placeholder="{{oldFavorite}}" ng-model="settings.favoriteMovie"
+             ng-change="findFavoriteMovie(settings.favoriteMovie)">
+    </label>
+    <ul ng-if="moviesHits.length > 0">
+      <li ng-repeat="hit in moviesHits | orderBy: popularity">
+        <button class="item" ng-click="chooseFavorite(hit)"><b>{{hit.title}}</b> <br>
+          <small>Premiär: {{hit.release_date}} </small><br />
+          <small>Genre: {{hit.genre_text}} </small>
+        </button>
+      </li>
+    </ul>
+    <a class="item govie-round-button" ng-click="logout()">Logg ut</a>
   </ion-content>
 </ion-view>

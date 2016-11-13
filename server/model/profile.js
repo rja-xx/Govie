@@ -9,7 +9,9 @@ var ProfileSchema   = new Schema({
     followers: [String],
     follows: [String],
     movies: Number,
-    imgUrl: String
+    imgUrl: String,
+    headerImageUrl: String,
+    favoriteMovie: String
 });
 
 module.exports = mongoose.model('Profile', ProfileSchema);
